@@ -843,18 +843,17 @@ async function writeToSheet(action, data) {
     return simulateWrite(action, data);
   }
   try {
-    // Utiliser un formulaire pour contourner CORS
-    const params = new URLSearchParams({
-      action: action,
-      ...data
-    });
+    const params = new URLSearchParams({ action: action, ...data });
     const url = `${APPS_SCRIPT_URL}?${params.toString()}`;
+    console.log('URL appelée :', url);
     const r = await fetch(url, { method: 'GET' });
-    const json = await r.json();
+    console.log('Status :', r.status);
+    const text = await r.text();
+    console.log('Réponse :', text);
+    const json = JSON.parse(text);
     return json;
   } catch(e) {
-    console.error('Erreur écriture', e);
-    // Fallback simulation locale
+    console.error('Erreur writeToSheet :', e);
     return simulateWrite(action, data);
   }
 }
