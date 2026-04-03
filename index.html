@@ -840,18 +840,22 @@ function parseCSVLine(line) {
 // ============================================================
 async function writeToSheet(action, data) {
   if (!APPS_SCRIPT_URL) {
-    // Mode simulation — met à jour localement
     return simulateWrite(action, data);
   }
   try {
-    const r = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action, ...data })
+    // Utiliser un formulaire pour contourner CORS
+    const params = new URLSearchParams({
+      action: action,
+      ...data
     });
-    return await r.json();
+    const url = `${APPS_SCRIPT_URL}?${params.toString()}`;
+    const r = await fetch(url, { method: 'GET' });
+    const json = await r.json();
+    return json;
   } catch(e) {
     console.error('Erreur écriture', e);
-    return { success: false };
+    // Fallback simulation locale
+    return simulateWrite(action, data);
   }
 }
 
