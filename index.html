@@ -33,520 +33,123 @@
     --font-head: 'Syne', sans-serif;
     --font-body: 'DM Sans', sans-serif;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    max-width: 420px;
-    margin: 0 auto;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  /* LOADING */
-  #loading {
-    position: fixed; inset: 0;
-    background: var(--bg);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 16px; z-index: 999;
-  }
-  .loading-logo {
-    font-family: var(--font-head);
-    font-size: 28px; font-weight: 800;
-    color: var(--accent);
-  }
-  .loading-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent); opacity: 0.3;
-    animation: pulse 1.2s ease-in-out infinite;
-  }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; max-width: 420px; margin: 0 auto; position: relative; overflow-x: hidden; }
+  #loading { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 999; }
+  .loading-logo { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--accent); }
+  .loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); opacity: 0.3; animation: pulse 1.2s ease-in-out infinite; }
   .loading-dots { display: flex; gap: 6px; }
   .loading-dot:nth-child(2) { animation-delay: 0.2s; }
   .loading-dot:nth-child(3) { animation-delay: 0.4s; }
   @keyframes pulse { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:1;transform:scale(1.3)} }
-
-  /* LOGIN USER */
-  #login-screen {
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    padding: 48px 24px 32px;
-  }
+  #login-screen { min-height: 100vh; display: flex; flex-direction: column; padding: 48px 24px 32px; }
   .login-header { margin-bottom: 48px; }
-  .login-logo {
-    font-family: var(--font-head);
-    font-size: 36px; font-weight: 800;
-    color: var(--accent); line-height: 1;
-  }
-  .login-sub {
-    font-size: 15px; color: var(--text2);
-    margin-top: 6px;
-  }
-  .login-label {
-    font-size: 12px; font-weight: 500;
-    color: var(--text3); text-transform: uppercase;
-    letter-spacing: 0.08em; margin-bottom: 10px;
-  }
-  .avatar-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px; margin-bottom: 32px;
-  }
-  .avatar-btn {
-    background: var(--surface);
-    border: 1.5px solid var(--border2);
-    border-radius: var(--radius);
-    padding: 16px 8px;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 8px;
-    cursor: pointer;
-    transition: all 0.18s;
-    font-family: var(--font-body);
-  }
-  .avatar-btn:hover, .avatar-btn.selected {
-    border-color: var(--accent);
-    background: var(--accent-light);
-  }
-  .avatar-circle {
-    width: 48px; height: 48px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-head);
-    font-size: 18px; font-weight: 700;
-  }
+  .login-logo { font-family: var(--font-head); font-size: 36px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .login-sub { font-size: 15px; color: var(--text2); margin-top: 6px; }
+  .login-label { font-size: 12px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 32px; }
+  .avatar-btn { background: var(--surface); border: 1.5px solid var(--border2); border-radius: var(--radius); padding: 16px 8px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: all 0.18s; font-family: var(--font-body); }
+  .avatar-btn:hover, .avatar-btn.selected { border-color: var(--accent); background: var(--accent-light); }
+  .avatar-circle { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 18px; font-weight: 700; }
   .avatar-name { font-size: 13px; font-weight: 500; color: var(--text); }
-  .btn-primary {
-    width: 100%; padding: 16px;
-    background: var(--accent);
-    color: white; border: none;
-    border-radius: var(--radius);
-    font-family: var(--font-head);
-    font-size: 16px; font-weight: 600;
-    cursor: pointer; transition: opacity 0.15s;
-  }
+  .btn-primary { width: 100%; padding: 16px; background: var(--accent); color: white; border: none; border-radius: var(--radius); font-family: var(--font-head); font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
   .btn-primary:hover { opacity: 0.9; }
   .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* APP SHELL */
   #app { display: none; flex-direction: column; min-height: 100vh; }
-
-  /* TOP BAR */
-  .topbar {
-    background: var(--surface);
-    padding: 16px 20px 14px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center;
-    position: sticky; top: 0; z-index: 10;
-  }
-  .topbar-title {
-    font-family: var(--font-head);
-    font-size: 18px; font-weight: 700;
-    color: var(--text); flex: 1;
-  }
-  .topbar-avatar {
-    width: 34px; height: 34px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-head);
-    font-size: 13px; font-weight: 700;
-    cursor: pointer;
-  }
-  .back-btn {
-    background: none; border: none;
-    font-size: 14px; color: var(--accent);
-    cursor: pointer; padding: 4px 12px 4px 0;
-    font-family: var(--font-body); font-weight: 500;
-  }
-
-  /* SCREENS */
+  .topbar { background: var(--surface); padding: 16px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--text); flex: 1; }
+  .topbar-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 13px; font-weight: 700; cursor: pointer; }
+  .back-btn { background: none; border: none; font-size: 14px; color: var(--accent); cursor: pointer; padding: 4px 12px 4px 0; font-family: var(--font-body); font-weight: 500; }
   .screen { display: none; flex: 1; overflow-y: auto; padding-bottom: 80px; }
   .screen.active { display: block; }
-
-  /* HOME */
-  .home-hero {
-    background: var(--accent);
-    padding: 24px 20px 28px;
-    color: white;
-  }
-  .home-greeting {
-    font-family: var(--font-head);
-    font-size: 26px; font-weight: 800;
-    line-height: 1.1; margin-bottom: 4px;
-  }
-  .home-week {
-    font-size: 13px; opacity: 0.75; margin-bottom: 20px;
-  }
-  .home-stats {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .stat-card {
-    background: rgba(255,255,255,0.15);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    backdrop-filter: blur(8px);
-  }
-  .stat-num {
-    font-family: var(--font-head);
-    font-size: 28px; font-weight: 800;
-    color: white; line-height: 1;
-  }
+  .home-hero { background: var(--accent); padding: 24px 20px 28px; color: white; }
+  .home-greeting { font-family: var(--font-head); font-size: 26px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
+  .home-week { font-size: 13px; opacity: 0.75; margin-bottom: 20px; }
+  .home-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { background: rgba(255,255,255,0.15); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .stat-num { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: white; line-height: 1; }
   .stat-label { font-size: 12px; opacity: 0.8; margin-top: 2px; }
-
   .section { padding: 20px 20px 0; }
-  .section-title {
-    font-family: var(--font-head);
-    font-size: 13px; font-weight: 700;
-    color: var(--text3); text-transform: uppercase;
-    letter-spacing: 0.07em; margin-bottom: 12px;
-  }
-
-  .nav-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    display: flex; align-items: center; gap: 14px;
-    cursor: pointer; margin-bottom: 10px;
-    transition: all 0.15s;
-    box-shadow: var(--shadow);
-  }
+  .section-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+  .nav-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; margin-bottom: 10px; transition: all 0.15s; box-shadow: var(--shadow); }
   .nav-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
-  .nav-card-icon {
-    width: 46px; height: 46px;
-    border-radius: var(--radius-sm);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; flex-shrink: 0;
-  }
+  .nav-card-icon { width: 46px; height: 46px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
   .nav-card-body { flex: 1; }
-  .nav-card-title {
-    font-family: var(--font-head);
-    font-size: 15px; font-weight: 700; color: var(--text);
-  }
+  .nav-card-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); }
   .nav-card-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
   .nav-card-arrow { color: var(--text3); font-size: 18px; }
-  .badge-pill {
-    font-size: 11px; font-weight: 600;
-    padding: 3px 9px; border-radius: 20px;
-  }
-
-  /* MARCHÉ */
-  .week-banner {
-    background: var(--accent-light);
-    margin: 16px 20px 0;
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    display: flex; align-items: center;
-    justify-content: space-between;
-  }
+  .week-banner { background: var(--accent-light); margin: 16px 20px 0; border-radius: var(--radius-sm); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
   .week-banner-text { font-size: 13px; font-weight: 500; color: var(--accent-text); }
-  .week-badge {
-    font-size: 11px; font-weight: 600;
-    background: var(--accent); color: white;
-    padding: 3px 9px; border-radius: 20px;
-  }
-
-  .task-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: all 0.15s;
-    box-shadow: var(--shadow);
-  }
+  .week-badge { font-size: 11px; font-weight: 600; background: var(--accent); color: white; padding: 3px 9px; border-radius: 20px; }
+  .task-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow); }
   .task-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
   .task-card.taken { opacity: 0.6; cursor: default; }
   .task-card.taken:hover { transform: none; box-shadow: var(--shadow); }
-  .task-card.done {
-    background: var(--accent-light);
-    border-color: rgba(45,106,79,0.2);
-  }
-
+  .task-card.done { background: var(--accent-light); border-color: rgba(45,106,79,0.2); }
   .task-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-  .task-name {
-    font-family: var(--font-head);
-    font-size: 15px; font-weight: 700; color: var(--text);
-    line-height: 1.3;
-  }
-  .pts-badge {
-    font-size: 11px; font-weight: 700;
-    padding: 3px 9px; border-radius: 20px;
-    background: var(--amber-light); color: var(--amber-text);
-    flex-shrink: 0; white-space: nowrap;
-  }
-  .task-meta {
-    display: flex; align-items: center;
-    gap: 6px; margin-top: 8px; flex-wrap: wrap;
-  }
-  .tag {
-    font-size: 11px; padding: 2px 8px; border-radius: 20px;
-    background: var(--surface2); color: var(--text2);
-  }
-  .assignee-tag {
-    font-size: 11px; font-weight: 500;
-    display: flex; align-items: center; gap: 4px;
-    color: var(--text2);
-  }
+  .task-name { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .pts-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; background: var(--amber-light); color: var(--amber-text); flex-shrink: 0; white-space: nowrap; }
+  .task-meta { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--surface2); color: var(--text2); }
+  .assignee-tag { font-size: 11px; font-weight: 500; display: flex; align-items: center; gap: 4px; color: var(--text2); }
   .assignee-dot { width: 7px; height: 7px; border-radius: 50%; }
-
-  /* DETAIL TACHE */
-  .detail-hero {
-    background: var(--surface);
-    margin: 16px 20px;
-    border-radius: var(--radius);
-    padding: 20px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-  }
-  .detail-name {
-    font-family: var(--font-head);
-    font-size: 22px; font-weight: 800;
-    color: var(--text); margin-bottom: 12px;
-    line-height: 1.2;
-  }
+  .detail-hero { background: var(--surface); margin: 16px 20px; border-radius: var(--radius); padding: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .detail-name { font-family: var(--font-head); font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 12px; line-height: 1.2; }
   .detail-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-  .detail-pts {
-    font-size: 14px; font-weight: 700;
-    padding: 5px 14px; border-radius: 20px;
-    background: var(--amber-light); color: var(--amber-text);
-  }
+  .detail-pts { font-size: 14px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: var(--amber-light); color: var(--amber-text); }
   .detail-desc { font-size: 14px; color: var(--text2); line-height: 1.6; }
-
-  .btn-prendre {
-    width: calc(100% - 40px);
-    margin: 0 20px;
-    padding: 16px;
-    background: var(--accent);
-    color: white; border: none;
-    border-radius: var(--radius);
-    font-family: var(--font-head);
-    font-size: 16px; font-weight: 700;
-    cursor: pointer; transition: all 0.15s;
-  }
+  .btn-prendre { width: calc(100% - 40px); margin: 0 20px; padding: 16px; background: var(--accent); color: white; border: none; border-radius: var(--radius); font-family: var(--font-head); font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
   .btn-prendre:hover { opacity: 0.9; transform: translateY(-1px); }
-  .btn-prendre.taken-btn {
-    background: var(--surface2); color: var(--text3);
-    cursor: not-allowed;
-  }
-  .btn-prendre.done-btn {
-    background: var(--accent-light); color: var(--accent-text);
-    cursor: not-allowed;
-  }
-
-  .btn-valider {
-    width: calc(100% - 40px);
-    margin: 10px 20px 0;
-    padding: 16px;
-    background: white;
-    color: var(--accent);
-    border: 2px solid var(--accent);
-    border-radius: var(--radius);
-    font-family: var(--font-head);
-    font-size: 16px; font-weight: 700;
-    cursor: pointer; transition: all 0.15s;
-  }
+  .btn-prendre.taken-btn { background: var(--surface2); color: var(--text3); cursor: not-allowed; }
+  .btn-prendre.done-btn { background: var(--accent-light); color: var(--accent-text); cursor: not-allowed; }
+  .btn-valider { width: calc(100% - 40px); margin: 10px 20px 0; padding: 16px; background: white; color: var(--accent); border: 2px solid var(--accent); border-radius: var(--radius); font-family: var(--font-head); font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
   .btn-valider:hover { background: var(--accent-light); }
-
-  /* MES MISSIONS */
-  .my-stats {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px; margin: 16px 20px 0;
-  }
-  .my-stat {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    box-shadow: var(--shadow);
-  }
-  .my-stat-num {
-    font-family: var(--font-head);
-    font-size: 32px; font-weight: 800; color: var(--text);
-  }
+  .btn-annuler { width: calc(100% - 40px); margin: 10px 20px 0; padding: 16px; background: white; color: var(--danger); border: 2px solid var(--danger); border-radius: var(--radius); font-family: var(--font-head); font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+  .btn-annuler:hover { background: var(--danger-light); }
+  .my-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 20px 0; }
+  .my-stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
+  .my-stat-num { font-family: var(--font-head); font-size: 32px; font-weight: 800; color: var(--text); }
   .my-stat-num.amber { color: var(--amber); }
   .my-stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-  .add-task-btn {
-    width: calc(100% - 40px);
-    margin: 0 20px 10px;
-    padding: 14px 16px;
-    background: var(--surface);
-    border: 1.5px dashed var(--border2);
-    border-radius: var(--radius);
-    font-family: var(--font-body);
-    font-size: 14px; font-weight: 500;
-    color: var(--text2);
-    cursor: pointer; text-align: left;
-    transition: all 0.15s;
-    display: flex; align-items: center; gap: 8px;
-  }
+  .add-task-btn { width: calc(100% - 40px); margin: 0 20px 10px; padding: 14px 16px; background: var(--surface); border: 1.5px dashed var(--border2); border-radius: var(--radius); font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--text2); cursor: pointer; text-align: left; transition: all 0.15s; display: flex; align-items: center; gap: 8px; }
   .add-task-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent-text); }
-
-  /* CLASSEMENT */
-  .podium {
-    padding: 20px;
-    display: flex; align-items: flex-end;
-    justify-content: center; gap: 8px;
-    margin-bottom: 4px;
-  }
-  .podium-item {
-    display: flex; flex-direction: column;
-    align-items: center; gap: 6px;
-  }
-  .podium-name {
-    font-size: 12px; font-weight: 500;
-    color: var(--text2); text-align: center;
-  }
-  .podium-avatar {
-    width: 48px; height: 48px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-head);
-    font-size: 18px; font-weight: 700;
-  }
-  .podium-block {
-    display: flex; align-items: center; justify-content: center;
-    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-    font-family: var(--font-head);
-    font-size: 20px; font-weight: 800;
-    color: white;
-  }
+  .podium { padding: 20px; display: flex; align-items: flex-end; justify-content: center; gap: 8px; margin-bottom: 4px; }
+  .podium-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .podium-name { font-size: 12px; font-weight: 500; color: var(--text2); text-align: center; }
+  .podium-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 18px; font-weight: 700; }
+  .podium-block { display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm) var(--radius-sm) 0 0; font-family: var(--font-head); font-size: 20px; font-weight: 800; color: white; }
   .p1 .podium-block { height: 70px; width: 90px; background: var(--amber); }
   .p2 .podium-block { height: 50px; width: 80px; background: #A8A59E; }
   .p3 .podium-block { height: 36px; width: 80px; background: #C07C3E; }
-
-  .rank-row {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    display: flex; align-items: center; gap: 12px;
-    box-shadow: var(--shadow);
-  }
-  .rank-num {
-    font-family: var(--font-head);
-    font-size: 18px; font-weight: 800;
-    color: var(--text3); width: 24px;
-  }
-  .rank-name {
-    font-family: var(--font-head);
-    font-size: 15px; font-weight: 700;
-    color: var(--text); flex: 1;
-  }
+  .rank-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); }
+  .rank-num { font-family: var(--font-head); font-size: 18px; font-weight: 800; color: var(--text3); width: 24px; }
+  .rank-name { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
   .rank-pts { font-size: 14px; color: var(--text2); font-weight: 500; }
-
-  /* AJOUTER TACHE */
   .form-group { margin-bottom: 16px; }
-  .form-label {
-    font-size: 12px; font-weight: 600;
-    color: var(--text3); text-transform: uppercase;
-    letter-spacing: 0.07em; margin-bottom: 6px; display: block;
-  }
-  .form-input, .form-select {
-    width: 100%; padding: 12px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius-sm);
-    font-family: var(--font-body);
-    font-size: 15px; color: var(--text);
-    outline: none; transition: border-color 0.15s;
-    -webkit-appearance: none;
-  }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; display: block; }
+  .form-input, .form-select { width: 100%; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 15px; color: var(--text); outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
   .form-input:focus, .form-select:focus { border-color: var(--accent); }
-
-  /* BOTTOM NAV */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 50%;
-    transform: translateX(-50%);
-    width: 100%; max-width: 420px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex; padding: 10px 0 20px;
-    z-index: 10;
-  }
-  .nav-btn {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; gap: 3px;
-    background: none; border: none;
-    cursor: pointer; padding: 4px 0;
-    font-family: var(--font-body);
-    font-size: 10px; font-weight: 500;
-    color: var(--text3); transition: color 0.15s;
-  }
+  .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 420px; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding: 10px 0 20px; z-index: 10; }
+  .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; cursor: pointer; padding: 4px 0; font-family: var(--font-body); font-size: 10px; font-weight: 500; color: var(--text3); transition: color 0.15s; }
   .nav-btn.active { color: var(--accent); }
   .nav-icon { font-size: 20px; line-height: 1; }
-
-  /* TOAST */
-  .toast {
-    position: fixed; bottom: 90px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--text); color: white;
-    padding: 12px 20px; border-radius: 30px;
-    font-size: 14px; font-weight: 500;
-    opacity: 0; transition: all 0.3s;
-    pointer-events: none; white-space: nowrap;
-    z-index: 100;
-  }
+  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: white; padding: 12px 20px; border-radius: 30px; font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; z-index: 100; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* MODAL AJOUT */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(26,26,24,0.5);
-    z-index: 50; align-items: flex-end;
-  }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,26,24,0.5); z-index: 50; align-items: flex-end; }
   .modal-overlay.open { display: flex; }
-  .modal-sheet {
-    background: var(--bg);
-    border-radius: 24px 24px 0 0;
-    padding: 24px 20px 40px;
-    width: 100%; max-height: 85vh;
-    overflow-y: auto;
-  }
-  .modal-title {
-    font-family: var(--font-head);
-    font-size: 20px; font-weight: 800;
-    margin-bottom: 20px; color: var(--text);
-  }
-  .modal-handle {
-    width: 40px; height: 4px; border-radius: 2px;
-    background: var(--border2); margin: 0 auto 20px;
-  }
-
-  .difficulty-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-  }
-  .diff-btn {
-    padding: 10px 8px; border-radius: var(--radius-sm);
-    border: 1.5px solid var(--border2);
-    background: var(--surface);
-    font-family: var(--font-body);
-    font-size: 13px; font-weight: 500;
-    color: var(--text2); cursor: pointer;
-    text-align: center; transition: all 0.15s;
-  }
-  .diff-btn.selected {
-    border-color: var(--accent);
-    background: var(--accent-light);
-    color: var(--accent-text);
-  }
-
-  /* UTILS */
+  .modal-sheet { background: var(--bg); border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 85vh; overflow-y: auto; }
+  .modal-title { font-family: var(--font-head); font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--text); }
+  .modal-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--border2); margin: 0 auto 20px; }
+  .difficulty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .diff-btn { padding: 10px 8px; border-radius: var(--radius-sm); border: 1.5px solid var(--border2); background: var(--surface); font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; text-align: center; transition: all 0.15s; }
+  .diff-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent-text); }
   .hidden { display: none !important; }
-  .error-msg {
-    text-align: center; padding: 40px 20px;
-    color: var(--text2); font-size: 14px;
-  }
+  .error-msg { text-align: center; padding: 40px 20px; color: var(--text2); font-size: 14px; }
   .error-icon { font-size: 36px; margin-bottom: 12px; }
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loading">
   <div class="loading-logo">Mission Tariel</div>
   <div class="loading-dots">
@@ -556,7 +159,6 @@
   </div>
 </div>
 
-<!-- LOGIN -->
 <div id="login-screen" style="display:none;">
   <div class="login-header">
     <div class="login-logo">Mission<br>Tariel 🏡</div>
@@ -567,61 +169,41 @@
   <button class="btn-primary" id="loginBtn" disabled onclick="doLogin()">Entrer dans l'app →</button>
 </div>
 
-<!-- APP -->
 <div id="app">
-
-  <!-- TOPBAR -->
   <div class="topbar" id="topbar">
-    <div class="topbar-title" id="topbarTitle">Mission Tariel</div>
+    <div class="topbar-title">Mission Tariel</div>
     <div class="topbar-avatar" id="topbarAvatar"></div>
   </div>
 
-  <!-- SCREEN: HOME -->
   <div class="screen active" id="screen-home">
     <div class="home-hero">
       <div class="home-greeting" id="homeGreeting">Bonjour !</div>
       <div class="home-week" id="homeWeek"></div>
       <div class="home-stats">
-        <div class="stat-card">
-          <div class="stat-num" id="statMesTaches">0</div>
-          <div class="stat-label">mes tâches cette semaine</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="statMesPoints">0</div>
-          <div class="stat-label">mes points</div>
-        </div>
+        <div class="stat-card"><div class="stat-num" id="statMesTaches">0</div><div class="stat-label">mes tâches cette semaine</div></div>
+        <div class="stat-card"><div class="stat-num" id="statMesPoints">0</div><div class="stat-label">mes points</div></div>
       </div>
     </div>
     <div class="section" style="margin-top:20px;">
       <div class="section-title">Menu</div>
       <div class="nav-card" onclick="goTo('marche')">
         <div class="nav-card-icon" style="background:#FFF3CD;">🛒</div>
-        <div class="nav-card-body">
-          <div class="nav-card-title">Marché aux missions</div>
-          <div class="nav-card-sub" id="marcheSubtitle">Chargement...</div>
-        </div>
+        <div class="nav-card-body"><div class="nav-card-title">Marché aux missions</div><div class="nav-card-sub" id="marcheSubtitle">Chargement...</div></div>
         <span class="nav-card-arrow">›</span>
       </div>
       <div class="nav-card" onclick="goTo('mesmissions')">
         <div class="nav-card-icon" style="background:#D8F3DC;">✅</div>
-        <div class="nav-card-body">
-          <div class="nav-card-title">Mes missions</div>
-          <div class="nav-card-sub" id="missionsSubtitle">Mes tâches assignées</div>
-        </div>
+        <div class="nav-card-body"><div class="nav-card-title">Mes missions</div><div class="nav-card-sub" id="missionsSubtitle">Mes tâches assignées</div></div>
         <span class="nav-card-arrow">›</span>
       </div>
       <div class="nav-card" onclick="goTo('classement')">
         <div class="nav-card-icon" style="background:#FFF3CD;">🏆</div>
-        <div class="nav-card-body">
-          <div class="nav-card-title">Classement</div>
-          <div class="nav-card-sub" id="classementSubtitle">Top famille</div>
-        </div>
+        <div class="nav-card-body"><div class="nav-card-title">Classement</div><div class="nav-card-sub" id="classementSubtitle">Top famille</div></div>
         <span class="nav-card-arrow">›</span>
       </div>
     </div>
   </div>
 
-  <!-- SCREEN: MARCHE -->
   <div class="screen" id="screen-marche">
     <div class="week-banner">
       <span class="week-banner-text" id="marcheSemaine"></span>
@@ -635,37 +217,27 @@
     </div>
   </div>
 
-  <!-- SCREEN: DETAIL -->
   <div class="screen" id="screen-detail">
     <div class="detail-hero" id="detailHero"></div>
     <button class="btn-prendre" id="btnPrendre" onclick="prendreTache()"></button>
     <button class="btn-valider hidden" id="btnValider" onclick="validerTache()">✓ Marquer comme faite</button>
+    <button class="btn-annuler hidden" id="btnAnnuler" onclick="deassignerTache()">✕ Annuler ma participation</button>
   </div>
 
-  <!-- SCREEN: MES MISSIONS -->
   <div class="screen" id="screen-mesmissions">
     <div class="my-stats">
-      <div class="my-stat">
-        <div class="my-stat-num" id="myTaskCount">0</div>
-        <div class="my-stat-label">tâches cette semaine</div>
-      </div>
-      <div class="my-stat">
-        <div class="my-stat-num amber" id="myPoints">0</div>
-        <div class="my-stat-label">points gagnés</div>
-      </div>
+      <div class="my-stat"><div class="my-stat-num" id="myTaskCount">0</div><div class="my-stat-label">tâches cette semaine</div></div>
+      <div class="my-stat"><div class="my-stat-num amber" id="myPoints">0</div><div class="my-stat-label">points gagnés</div></div>
     </div>
     <div class="section" style="margin-top:16px;">
       <div class="section-title">Mes tâches</div>
       <div id="listeMesTaches"></div>
     </div>
     <div style="margin-top:4px;">
-      <button class="add-task-btn" onclick="openAddModal()">
-        <span>+</span> Ajouter une tâche non prévue
-      </button>
+      <button class="add-task-btn" onclick="openAddModal()"><span>+</span> Ajouter une tâche non prévue</button>
     </div>
   </div>
 
-  <!-- SCREEN: CLASSEMENT -->
   <div class="screen" id="screen-classement">
     <div class="podium" id="podium"></div>
     <div class="section">
@@ -674,24 +246,14 @@
     </div>
   </div>
 
-  <!-- BOTTOM NAV -->
   <div class="bottom-nav">
-    <button class="nav-btn active" id="nav-home" onclick="goTo('home')">
-      <span class="nav-icon">🏠</span>Accueil
-    </button>
-    <button class="nav-btn" id="nav-marche" onclick="goTo('marche')">
-      <span class="nav-icon">🛒</span>Marché
-    </button>
-    <button class="nav-btn" id="nav-mesmissions" onclick="goTo('mesmissions')">
-      <span class="nav-icon">✅</span>Mes tâches
-    </button>
-    <button class="nav-btn" id="nav-classement" onclick="goTo('classement')">
-      <span class="nav-icon">🏆</span>Top
-    </button>
+    <button class="nav-btn active" id="nav-home" onclick="goTo('home')"><span class="nav-icon">🏠</span>Accueil</button>
+    <button class="nav-btn" id="nav-marche" onclick="goTo('marche')"><span class="nav-icon">🛒</span>Marché</button>
+    <button class="nav-btn" id="nav-mesmissions" onclick="goTo('mesmissions')"><span class="nav-icon">✅</span>Mes tâches</button>
+    <button class="nav-btn" id="nav-classement" onclick="goTo('classement')"><span class="nav-icon">🏆</span>Top</button>
   </div>
 </div>
 
-<!-- MODAL AJOUT TACHE -->
 <div class="modal-overlay" id="addModal">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
@@ -703,24 +265,16 @@
     <div class="form-group">
       <label class="form-label">Catégorie</label>
       <select class="form-select" id="newTaskCategory">
-        <option>Maison</option>
-        <option>Cuisine</option>
-        <option>Animaux</option>
-        <option>Linge</option>
-        <option>Courses</option>
-        <option>Extérieur</option>
-        <option>Autre</option>
+        <option>Maison</option><option>Cuisine</option><option>Animaux</option>
+        <option>Linge</option><option>Courses</option><option>Extérieur</option><option>Autre</option>
       </select>
     </div>
     <div class="form-group">
       <label class="form-label">Durée estimée</label>
       <select class="form-select" id="newTaskDuration">
-        <option value="15">15 minutes</option>
-        <option value="30">30 minutes</option>
-        <option value="45">45 minutes</option>
-        <option value="60">1 heure</option>
-        <option value="90">1h30</option>
-        <option value="120">2 heures ou plus</option>
+        <option value="15">15 minutes</option><option value="30">30 minutes</option>
+        <option value="45">45 minutes</option><option value="60">1 heure</option>
+        <option value="90">1h30</option><option value="120">2 heures ou plus</option>
       </select>
     </div>
     <div class="form-group">
@@ -736,18 +290,13 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// CONFIG
-// ============================================================
 const SHEET_ID = '1a0hnvh8hVwmDHkSU7rcBG5nRXo3XOXaOylgq-arr2ow';
 const GIDS = { Users: '0', Tasks: '1057606063', TemplateTasks: '2134859603', History: '1581537615' };
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4aGuqSR_O4IGC_XlDZMZ4TA-KMZjOBAWJMveSj7FsksUkFhWRnkhOPR0yqGAjJVbXlg/exec';
 
-// Couleurs par membre
 const COLORS = {
   'Maman':  { bg:'#EEEDFE', text:'#3C3489' },
   'Papa':   { bg:'#D8F3DC', text:'#1B4332' },
@@ -755,21 +304,14 @@ const COLORS = {
   'Adrien': { bg:'#FFF3CD', text:'#7D4E00' },
   'Chloé':  { bg:'#E6F1FB', text:'#0C447C' },
 };
-const DOT_COLORS = {
-  'Maman':'#7F77DD','Papa':'#2D6A4F','Mathis':'#D85A30','Adrien':'#E9952A','Chloé':'#378ADD'
-};
+const DOT_COLORS = { 'Maman':'#7F77DD','Papa':'#2D6A4F','Mathis':'#D85A30','Adrien':'#E9952A','Chloé':'#378ADD' };
 
-// State
 let currentUser = null;
-let currentScreen = 'home';
 let allTasks = [];
 let allUsers = [];
 let selectedTask = null;
 let selectedDiff = 'Facile';
 
-// ============================================================
-// UTILS
-// ============================================================
 function getWeekStr(date) {
   const d = date || new Date();
   const jan1 = new Date(d.getFullYear(), 0, 1);
@@ -780,13 +322,10 @@ function getWeekStr(date) {
 function calcPoints(duration, difficulty) {
   const dur = parseInt(duration) || 15;
   const pts = dur <= 15 ? 1 : dur <= 30 ? 2 : dur <= 60 ? 4 : 5;
-  const bonus = difficulty === 'Moyen' ? 1 : difficulty === 'Difficile' ? 2 : 0;
-  return pts + bonus;
+  return pts + (difficulty === 'Moyen' ? 1 : difficulty === 'Difficile' ? 2 : 0);
 }
 
-function initials(name) {
-  return name ? name.slice(0,2).toUpperCase() : '?';
-}
+function initials(name) { return name ? name.slice(0,2).toUpperCase() : '?'; }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -795,14 +334,11 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ============================================================
-// GOOGLE SHEETS — lecture via CSV public
-// ============================================================
 async function fetchSheet(sheetName) {
   const gid = GIDS[sheetName];
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}&t=${Date.now()}`;
   try {
-    const r = await fetch(url);
+    const r = await fetch(url, { cache: 'no-store' });
     const text = await r.text();
     return parseCSV(text);
   } catch(e) {
@@ -835,23 +371,12 @@ function parseCSVLine(line) {
   return result;
 }
 
-// ============================================================
-// ÉCRITURE — via Apps Script (Phase 4) ou simulation locale
-// ============================================================
 async function writeToSheet(action, data) {
-  if (!APPS_SCRIPT_URL) {
-    return simulateWrite(action, data);
-  }
+  if (!APPS_SCRIPT_URL) return simulateWrite(action, data);
   try {
-    const params = new URLSearchParams({ action: action, ...data });
-    const url = `${APPS_SCRIPT_URL}?${params.toString()}`;
-    console.log('URL appelée :', url);
-    const r = await fetch(url, { method: 'GET' });
-    console.log('Status :', r.status);
-    const text = await r.text();
-    console.log('Réponse :', text);
-    const json = JSON.parse(text);
-    return json;
+    const params = new URLSearchParams({ action, ...data });
+    const r = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { method: 'GET' });
+    return JSON.parse(await r.text());
   } catch(e) {
     console.error('Erreur writeToSheet :', e);
     return simulateWrite(action, data);
@@ -859,66 +384,31 @@ async function writeToSheet(action, data) {
 }
 
 function simulateWrite(action, data) {
-  if (action === 'assignTask') {
-    const task = allTasks.find(t => t.TaskName === data.taskName && t.Week === data.week);
-    if (task) {
-      task.AssignedTo = data.userName;
-      task.AssignedDate = new Date().toLocaleDateString('fr-FR');
-    }
-    return { success: true, simulated: true };
-  }
-  if (action === 'doneTask') {
-    const task = allTasks.find(t => t.TaskName === data.taskName && t.Week === data.week);
-    if (task) { task.IsDone = 'TRUE'; task.DoneBy = data.userName; }
-    return { success: true, simulated: true };
-  }
-  if (action === 'addTask') {
-    allTasks.push({
-      TaskName: data.taskName, Week: data.week,
-      Points: String(data.points), Category: data.category,
-      AssignedTo: data.userName, AssignedDate: new Date().toLocaleDateString('fr-FR'),
-      IsDone: 'FALSE', DoneBy: '', DoneDate: '',
-      IsExceptional: 'TRUE', AddedBy: data.userName
-    });
-    return { success: true, simulated: true };
-  }
-  return { success: false };
+  const task = allTasks.find(t => t.TaskName === data.taskName && t.Week === data.week);
+  if (action === 'assignTask' && task) { task.AssignedTo = data.userName; task.AssignedDate = new Date().toLocaleDateString('fr-FR'); }
+  if (action === 'doneTask' && task) { task.IsDone = 'TRUE'; task.DoneBy = data.userName; }
+  if (action === 'unassignTask' && task) { task.AssignedTo = ''; task.AssignedDate = ''; }
+  if (action === 'addTask') { allTasks.push({ TaskName: data.taskName, Week: data.week, Points: String(data.points), Category: data.category, AssignedTo: data.userName, AssignedDate: new Date().toLocaleDateString('fr-FR'), IsDone: 'FALSE', DoneBy: '', DoneDate: '', IsExceptional: 'TRUE', AddedBy: data.userName }); }
+  return { success: true, simulated: true };
 }
 
-// ============================================================
-// LOGIN
-// ============================================================
 async function initLogin() {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
-
   const saved = localStorage.getItem('tariel_user');
   allUsers = await fetchSheet('Users');
-
   const grid = document.getElementById('avatarGrid');
-  const members = allUsers.length ? allUsers : [
-    {Name:'Maman'},{Name:'Papa'},{Name:'Mathis'},{Name:'Adrien'},{Name:'Chloé'}
-  ];
-
+  const members = allUsers.length ? allUsers : [{Name:'Maman'},{Name:'Papa'},{Name:'Mathis'},{Name:'Adrien'},{Name:'Chloé'}];
   members.forEach(u => {
-    const name = u.Name;
-    const col = COLORS[name] || { bg:'#F1EFE8', text:'#444441' };
+    const col = COLORS[u.Name] || { bg:'#F1EFE8', text:'#444441' };
     const btn = document.createElement('button');
-    btn.className = 'avatar-btn';
-    btn.dataset.name = name;
-    if (saved === name) btn.classList.add('selected');
-    btn.innerHTML = `
-      <div class="avatar-circle" style="background:${col.bg};color:${col.text}">${initials(name)}</div>
-      <div class="avatar-name">${name}</div>
-    `;
-    btn.onclick = () => selectUser(name);
+    btn.className = 'avatar-btn' + (saved === u.Name ? ' selected' : '');
+    btn.dataset.name = u.Name;
+    btn.innerHTML = `<div class="avatar-circle" style="background:${col.bg};color:${col.text}">${initials(u.Name)}</div><div class="avatar-name">${u.Name}</div>`;
+    btn.onclick = () => selectUser(u.Name);
     grid.appendChild(btn);
   });
-
-  if (saved) {
-    document.getElementById('loginBtn').disabled = false;
-    currentUser = saved;
-  }
+  if (saved) { document.getElementById('loginBtn').disabled = false; currentUser = saved; }
 }
 
 function selectUser(name) {
@@ -936,62 +426,38 @@ async function doLogin() {
   await loadApp();
 }
 
-// ============================================================
-// APP INIT
-// ============================================================
 async function loadApp() {
   document.getElementById('loading').style.display = 'flex';
   const [tasks, users] = await Promise.all([fetchSheet('Tasks'), fetchSheet('Users')]);
   allTasks = tasks;
   allUsers = users.length ? users : [{Name:'Maman'},{Name:'Papa'},{Name:'Mathis'},{Name:'Adrien'},{Name:'Chloé'}];
   document.getElementById('loading').style.display = 'none';
-
   const col = COLORS[currentUser] || { bg:'#F1EFE8', text:'#444441' };
   const av = document.getElementById('topbarAvatar');
   av.textContent = initials(currentUser);
   av.style.background = col.bg;
   av.style.color = col.text;
-  av.onclick = () => {
-    localStorage.removeItem('tariel_user');
-    location.reload();
-  };
-
-  renderHome();
-  renderMarche();
-  renderMesMissions();
-  renderClassement();
+  av.onclick = () => { localStorage.removeItem('tariel_user'); location.reload(); };
+  renderHome(); renderMarche(); renderMesMissions(); renderClassement();
 }
 
-// ============================================================
-// NAVIGATION
-// ============================================================
 function goTo(screen) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`screen-${screen}`).classList.add('active');
-  const navBtn = document.getElementById(`nav-${screen}`);
-  if (navBtn) navBtn.classList.add('active');
-
-  const topbar = document.getElementById('topbar');
-  const titles = {
-    home: 'Mission Tariel', marche: 'Marché aux missions',
-    mesmissions: 'Mes missions', classement: 'Classement'
-  };
-  topbar.innerHTML = `
-    <div class="topbar-title">${titles[screen] || 'Mission Tariel'}</div>
-    <div class="topbar-avatar" id="topbarAvatar" onclick="localStorage.removeItem('tariel_user');location.reload()" style="background:${(COLORS[currentUser]||{bg:'#eee'}).bg};color:${(COLORS[currentUser]||{text:'#333'}).text}">${initials(currentUser)}</div>
-  `;
-  currentScreen = screen;
+  const nb = document.getElementById(`nav-${screen}`);
+  if (nb) nb.classList.add('active');
+  const titles = { home:'Mission Tariel', marche:'Marché aux missions', mesmissions:'Mes missions', classement:'Classement' };
+  const col = COLORS[currentUser] || { bg:'#eee', text:'#333' };
+  document.getElementById('topbar').innerHTML = `<div class="topbar-title">${titles[screen]||'Mission Tariel'}</div><div class="topbar-avatar" onclick="localStorage.removeItem('tariel_user');location.reload()" style="background:${col.bg};color:${col.text}">${initials(currentUser)}</div>`;
 }
 
 function goToDetail(task) {
   selectedTask = task;
-  const week = getWeekStr();
   const isAssignedToMe = task.AssignedTo === currentUser;
   const isTaken = task.AssignedTo && task.AssignedTo !== '' && task.AssignedTo !== currentUser;
   const isDone = task.IsDone === 'TRUE' || task.IsDone === 'true';
 
-  const col = COLORS[task.AssignedTo] || {};
   document.getElementById('detailHero').innerHTML = `
     <div class="detail-name">${task.TaskName}</div>
     <div class="detail-tags">
@@ -999,86 +465,58 @@ function goToDetail(task) {
       ${task.Category ? `<span class="tag">${task.Category}</span>` : ''}
       ${task.IsExceptional === 'TRUE' ? '<span class="tag" style="background:#FFF3CD;color:#7D4E00;">Exceptionnel</span>' : ''}
     </div>
-    ${isTaken ? `<div class="detail-desc">Prise par <strong>${task.AssignedTo}</strong>${isDone ? ' — ✅ déjà réalisée' : ''}</div>` : '<div class="detail-desc">Cette tâche est disponible — sois le premier à la prendre !</div>'}
+    <div class="detail-desc">${isTaken ? `Prise par <strong>${task.AssignedTo}</strong>${isDone?' — ✅ déjà réalisée':''}` : isAssignedToMe ? `Tu as pris cette tâche${isDone?' — ✅ réalisée':''}` : 'Disponible — sois le premier à la prendre !'}</div>
   `;
 
   const btnP = document.getElementById('btnPrendre');
   const btnV = document.getElementById('btnValider');
+  const btnA = document.getElementById('btnAnnuler');
+  btnV.classList.add('hidden');
+  btnA.classList.add('hidden');
 
   if (isDone) {
-    btnP.textContent = '✅ Tâche réalisée';
-    btnP.className = 'btn-prendre done-btn';
-    btnV.classList.add('hidden');
+    btnP.textContent = '✅ Tâche réalisée'; btnP.className = 'btn-prendre done-btn';
   } else if (isTaken) {
-    btnP.textContent = `Prise par ${task.AssignedTo}`;
-    btnP.className = 'btn-prendre taken-btn';
-    btnV.classList.add('hidden');
+    btnP.textContent = `Prise par ${task.AssignedTo}`; btnP.className = 'btn-prendre taken-btn';
   } else if (isAssignedToMe) {
-    btnP.textContent = '✓ Tu as pris cette tâche';
-    btnP.className = 'btn-prendre taken-btn';
-    btnV.classList.remove('hidden');
+    btnP.textContent = '✓ Tu as pris cette tâche'; btnP.className = 'btn-prendre taken-btn';
+    btnV.classList.remove('hidden'); btnA.classList.remove('hidden');
   } else {
-    btnP.textContent = 'Je prends cette tâche →';
-    btnP.className = 'btn-prendre';
-    btnV.classList.add('hidden');
+    btnP.textContent = 'Je prends cette tâche →'; btnP.className = 'btn-prendre';
   }
 
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('screen-detail').classList.add('active');
-
-  const topbar = document.getElementById('topbar');
-  topbar.innerHTML = `
-    <button class="back-btn" onclick="goTo('marche')">← Retour</button>
-    <div class="topbar-title">Détail</div>
-    <div class="topbar-avatar" style="background:${(COLORS[currentUser]||{bg:'#eee'}).bg};color:${(COLORS[currentUser]||{text:'#333'}).text}">${initials(currentUser)}</div>
-  `;
+  const col = COLORS[currentUser] || { bg:'#eee', text:'#333' };
+  document.getElementById('topbar').innerHTML = `<button class="back-btn" onclick="goTo('marche')">← Retour</button><div class="topbar-title">Détail</div><div class="topbar-avatar" style="background:${col.bg};color:${col.text}">${initials(currentUser)}</div>`;
 }
 
-// ============================================================
-// RENDER HOME
-// ============================================================
 function renderHome() {
   const week = getWeekStr();
-  const now = new Date();
   const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   document.getElementById('homeGreeting').textContent = `Bonjour, ${currentUser} !`;
-  document.getElementById('homeWeek').textContent = `${jours[now.getDay()]} — Semaine ${week.split('-W')[1]}`;
-
+  document.getElementById('homeWeek').textContent = `${jours[new Date().getDay()]} — Semaine ${week.split('-W')[1]}`;
   const myTasks = allTasks.filter(t => t.Week === week && t.AssignedTo === currentUser);
   const myDone = myTasks.filter(t => t.IsDone === 'TRUE' || t.IsDone === 'true');
-  const myPts = myTasks.reduce((s,t) => s + (parseInt(t.Points)||0), 0);
-
   document.getElementById('statMesTaches').textContent = myTasks.length;
-  document.getElementById('statMesPoints').textContent = myPts;
-
+  document.getElementById('statMesPoints').textContent = myTasks.reduce((s,t) => s+(parseInt(t.Points)||0), 0);
   const libres = allTasks.filter(t => t.Week === week && (!t.AssignedTo || t.AssignedTo === ''));
   document.getElementById('marcheSubtitle').textContent = libres.length > 0 ? `${libres.length} tâche${libres.length>1?'s':''} libre${libres.length>1?'s':''}` : 'Toutes les tâches sont prises';
   document.getElementById('missionsSubtitle').textContent = `${myTasks.length} tâche${myTasks.length!==1?'s':''} — ${myDone.length} réalisée${myDone.length!==1?'s':''}`;
-
-  const sorted = [...allUsers].map(u => ({
-    name: u.Name,
-    pts: allTasks.filter(t => t.Week===week && t.AssignedTo===u.Name).reduce((s,t)=>s+(parseInt(t.Points)||0),0)
-  })).sort((a,b)=>b.pts-a.pts);
+  const sorted = [...allUsers].map(u => ({ name:u.Name, pts:allTasks.filter(t=>t.Week===week&&t.AssignedTo===u.Name).reduce((s,t)=>s+(parseInt(t.Points)||0),0) })).sort((a,b)=>b.pts-a.pts);
   if (sorted.length) document.getElementById('classementSubtitle').textContent = `${sorted[0].name} mène avec ${sorted[0].pts} pts`;
 }
 
-// ============================================================
-// RENDER MARCHE
-// ============================================================
 function renderMarche() {
   const week = getWeekStr();
   document.getElementById('marcheSemaine').textContent = `Semaine ${week.split('-W')[1]}`;
-
   const libres = allTasks.filter(t => t.Week === week && (!t.AssignedTo || t.AssignedTo === ''));
   const assignees = allTasks.filter(t => t.Week === week && t.AssignedTo && t.AssignedTo !== '');
-
   document.getElementById('marcheLibresBadge').textContent = `${libres.length} libre${libres.length!==1?'s':''}`;
-
   const libresEl = document.getElementById('listeTachesLibres');
   libresEl.innerHTML = libres.length ? '' : '<div class="error-msg"><div class="error-icon">🎉</div>Toutes les tâches sont prises !</div>';
   libres.forEach(t => libresEl.appendChild(makeTaskCard(t, false)));
-
   const assigneesEl = document.getElementById('listeTachesAssignees');
   assigneesEl.innerHTML = '';
   assignees.forEach(t => assigneesEl.appendChild(makeTaskCard(t, true)));
@@ -1087,113 +525,78 @@ function renderMarche() {
 function makeTaskCard(task, taken) {
   const isDone = task.IsDone === 'TRUE' || task.IsDone === 'true';
   const div = document.createElement('div');
-  div.className = `task-card${taken ? ' taken' : ''}${isDone ? ' done' : ''}`;
+  div.className = `task-card${taken?' taken':''}${isDone?' done':''}`;
   div.onclick = () => goToDetail(task);
-
   const dot = task.AssignedTo ? `<span class="assignee-dot" style="background:${DOT_COLORS[task.AssignedTo]||'#ccc'}"></span>` : '';
   div.innerHTML = `
-    <div class="task-top">
-      <span class="task-name">${task.TaskName}</span>
-      <span class="pts-badge">⭐ ${task.Points}</span>
-    </div>
+    <div class="task-top"><span class="task-name">${task.TaskName}</span><span class="pts-badge">⭐ ${task.Points}</span></div>
     <div class="task-meta">
-      ${task.Category ? `<span class="tag">${task.Category}</span>` : ''}
-      ${isDone ? '<span class="tag" style="background:#D8F3DC;color:#1B4332;">✓ Faite</span>' : ''}
-      ${task.AssignedTo ? `<span class="assignee-tag">${dot}${task.AssignedTo}</span>` : ''}
+      ${task.Category?`<span class="tag">${task.Category}</span>`:''}
+      ${isDone?'<span class="tag" style="background:#D8F3DC;color:#1B4332;">✓ Faite</span>':''}
+      ${task.AssignedTo?`<span class="assignee-tag">${dot}${task.AssignedTo}</span>`:''}
     </div>
   `;
   return div;
 }
 
-// ============================================================
-// PRENDRE / VALIDER TACHE
-// ============================================================
 async function prendreTache() {
-  if (!selectedTask) return;
-  const week = getWeekStr();
-  const isAssigned = selectedTask.AssignedTo && selectedTask.AssignedTo !== '';
-  if (isAssigned) return;
-
+  if (!selectedTask || (selectedTask.AssignedTo && selectedTask.AssignedTo !== '')) return;
   const btn = document.getElementById('btnPrendre');
-  btn.textContent = 'En cours...';
-  btn.disabled = true;
-
-  const res = await writeToSheet('assignTask', {
-    taskName: selectedTask.TaskName,
-    week: week,
-    userName: currentUser
-  });
-
+  btn.textContent = 'En cours...'; btn.disabled = true;
+  await writeToSheet('assignTask', { taskName: selectedTask.TaskName, week: getWeekStr(), userName: currentUser });
   selectedTask.AssignedTo = currentUser;
-  btn.textContent = '✓ Tu as pris cette tâche';
-  btn.className = 'btn-prendre taken-btn';
-  btn.disabled = false;
+  btn.textContent = '✓ Tu as pris cette tâche'; btn.className = 'btn-prendre taken-btn'; btn.disabled = false;
   document.getElementById('btnValider').classList.remove('hidden');
-
+  document.getElementById('btnAnnuler').classList.remove('hidden');
   showToast(`✅ Tâche prise ! +${selectedTask.Points} pts potentiels`);
-  if (res.simulated) showToast('💡 Mode démo — connectez Apps Script pour sauvegarder');
-
-  renderHome();
-  renderMarche();
-  renderMesMissions();
+  renderHome(); renderMarche(); renderMesMissions();
 }
 
 async function validerTache() {
   if (!selectedTask) return;
-  const week = getWeekStr();
   const btn = document.getElementById('btnValider');
-  btn.textContent = 'En cours...';
-  btn.disabled = true;
-
-  const res = await writeToSheet('doneTask', {
-    taskName: selectedTask.TaskName,
-    week: week,
-    userName: currentUser
-  });
-
-  selectedTask.IsDone = 'TRUE';
-  selectedTask.DoneBy = currentUser;
-
+  btn.textContent = 'En cours...'; btn.disabled = true;
+  await writeToSheet('doneTask', { taskName: selectedTask.TaskName, week: getWeekStr(), userName: currentUser });
+  selectedTask.IsDone = 'TRUE'; selectedTask.DoneBy = currentUser;
   document.getElementById('btnPrendre').textContent = '✅ Tâche réalisée';
   document.getElementById('btnPrendre').className = 'btn-prendre done-btn';
   btn.classList.add('hidden');
-
+  document.getElementById('btnAnnuler').classList.add('hidden');
   showToast(`🎉 Bravo ! +${selectedTask.Points} points gagnés`);
-  renderHome();
-  renderMarche();
-  renderMesMissions();
-  renderClassement();
+  renderHome(); renderMarche(); renderMesMissions(); renderClassement();
 }
 
-// ============================================================
-// RENDER MES MISSIONS
-// ============================================================
+async function deassignerTache() {
+  if (!selectedTask) return;
+  const btn = document.getElementById('btnAnnuler');
+  btn.textContent = 'En cours...'; btn.disabled = true;
+  await writeToSheet('unassignTask', { taskName: selectedTask.TaskName, week: getWeekStr(), userName: currentUser });
+  selectedTask.AssignedTo = ''; selectedTask.AssignedDate = '';
+  document.getElementById('btnPrendre').textContent = 'Je prends cette tâche →';
+  document.getElementById('btnPrendre').className = 'btn-prendre';
+  document.getElementById('btnValider').classList.add('hidden');
+  btn.classList.add('hidden'); btn.disabled = false;
+  showToast('✓ Tâche libérée');
+  renderHome(); renderMarche(); renderMesMissions();
+}
+
 function renderMesMissions() {
   const week = getWeekStr();
   const myTasks = allTasks.filter(t => t.Week === week && t.AssignedTo === currentUser);
-  const myPts = myTasks.reduce((s,t) => s + (parseInt(t.Points)||0), 0);
-
   document.getElementById('myTaskCount').textContent = myTasks.length;
-  document.getElementById('myPoints').textContent = myPts;
-
+  document.getElementById('myPoints').textContent = myTasks.reduce((s,t) => s+(parseInt(t.Points)||0), 0);
   const el = document.getElementById('listeMesTaches');
   el.innerHTML = '';
-  if (!myTasks.length) {
-    el.innerHTML = '<div class="error-msg"><div class="error-icon">🛒</div>Pas encore de tâches.<br>Va au marché pour en prendre !</div>';
-    return;
-  }
+  if (!myTasks.length) { el.innerHTML = '<div class="error-msg"><div class="error-icon">🛒</div>Pas encore de tâches.<br>Va au marché pour en prendre !</div>'; return; }
   myTasks.forEach(t => {
     const isDone = t.IsDone === 'TRUE' || t.IsDone === 'true';
     const div = document.createElement('div');
-    div.className = `task-card${isDone ? ' done' : ''}`;
+    div.className = `task-card${isDone?' done':''}`;
     div.onclick = () => goToDetail(t);
     div.innerHTML = `
-      <div class="task-top">
-        <span class="task-name">${t.TaskName}</span>
-        <span class="pts-badge">⭐ ${t.Points}</span>
-      </div>
+      <div class="task-top"><span class="task-name">${t.TaskName}</span><span class="pts-badge">⭐ ${t.Points}</span></div>
       <div class="task-meta">
-        ${t.Category ? `<span class="tag">${t.Category}</span>` : ''}
+        ${t.Category?`<span class="tag">${t.Category}</span>`:''}
         <span class="tag" style="${isDone?'background:#D8F3DC;color:#1B4332':'background:#FFF3CD;color:#7D4E00'}">${isDone?'✓ Réalisée':'En cours'}</span>
       </div>
     `;
@@ -1201,85 +604,45 @@ function renderMesMissions() {
   });
 }
 
-// ============================================================
-// RENDER CLASSEMENT
-// ============================================================
 function renderClassement() {
   const week = getWeekStr();
   const ranked = allUsers.map(u => ({
     name: u.Name,
-    pts: allTasks.filter(t => t.Week===week && t.AssignedTo===u.Name).reduce((s,t)=>s+(parseInt(t.Points)||0),0),
-    done: allTasks.filter(t => t.Week===week && t.AssignedTo===u.Name && (t.IsDone==='TRUE'||t.IsDone==='true')).length
-  })).sort((a,b) => b.pts - a.pts);
-
-  // Podium top 3
+    pts: allTasks.filter(t=>t.Week===week&&t.AssignedTo===u.Name).reduce((s,t)=>s+(parseInt(t.Points)||0),0),
+    done: allTasks.filter(t=>t.Week===week&&t.AssignedTo===u.Name&&(t.IsDone==='TRUE'||t.IsDone==='true')).length
+  })).sort((a,b)=>b.pts-a.pts);
   const podium = document.getElementById('podium');
   if (ranked.length >= 3) {
-    const p = (u, cls, medal) => {
-      const col = COLORS[u.name] || { bg:'#eee', text:'#333' };
-      return `<div class="podium-item ${cls}">
-        <div class="podium-name">${u.name}</div>
-        <div class="podium-avatar" style="background:${col.bg};color:${col.text}">${initials(u.name)}</div>
-        <div class="podium-block">${medal}</div>
-      </div>`;
-    };
-    podium.innerHTML = p(ranked[1],'p2','🥈') + p(ranked[0],'p1','🥇') + p(ranked[2],'p3','🥉');
+    const p = (u,cls,medal) => { const col=COLORS[u.name]||{bg:'#eee',text:'#333'}; return `<div class="podium-item ${cls}"><div class="podium-name">${u.name}</div><div class="podium-avatar" style="background:${col.bg};color:${col.text}">${initials(u.name)}</div><div class="podium-block">${medal}</div></div>`; };
+    podium.innerHTML = p(ranked[1],'p2','🥈')+p(ranked[0],'p1','🥇')+p(ranked[2],'p3','🥉');
   }
-
   const el = document.getElementById('listeClassement');
   el.innerHTML = '';
-  ranked.forEach((u, i) => {
-    const col = COLORS[u.name] || { bg:'#eee', text:'#333' };
+  ranked.forEach((u,i) => {
+    const col = COLORS[u.name]||{bg:'#eee',text:'#333'};
     const medals = ['🥇','🥈','🥉'];
     const div = document.createElement('div');
     div.className = 'rank-row';
-    div.innerHTML = `
-      <div class="rank-num">${medals[i] || (i+1)}</div>
-      <div class="topbar-avatar" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:13px;font-weight:700;background:${col.bg};color:${col.text};flex-shrink:0">${initials(u.name)}</div>
-      <div class="rank-name">${u.name}</div>
-      <div class="rank-pts">${u.pts} pts · ${u.done} faites</div>
-    `;
+    div.innerHTML = `<div class="rank-num">${medals[i]||(i+1)}</div><div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:13px;font-weight:700;background:${col.bg};color:${col.text};flex-shrink:0">${initials(u.name)}</div><div class="rank-name">${u.name}</div><div class="rank-pts">${u.pts} pts · ${u.done} faites</div>`;
     el.appendChild(div);
   });
 }
 
-// ============================================================
-// AJOUT TACHE EXCEPTIONNELLE
-// ============================================================
-function openAddModal() {
-  document.getElementById('addModal').classList.add('open');
-}
-function closeAddModal() {
-  document.getElementById('addModal').classList.remove('open');
-}
-function selectDiff(btn, diff) {
-  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  selectedDiff = diff;
-}
+function openAddModal() { document.getElementById('addModal').classList.add('open'); }
+function closeAddModal() { document.getElementById('addModal').classList.remove('open'); }
+function selectDiff(btn, diff) { document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); selectedDiff=diff; }
+
 async function ajouterTache() {
   const name = document.getElementById('newTaskName').value.trim();
   if (!name) { showToast('⚠️ Donne un nom à la tâche'); return; }
-
-  const cat = document.getElementById('newTaskCategory').value;
-  const dur = document.getElementById('newTaskDuration').value;
-  const pts = calcPoints(dur, selectedDiff);
-  const week = getWeekStr();
-
-  await writeToSheet('addTask', {
-    taskName: name, week, points: pts,
-    category: cat, userName: currentUser
-  });
-
+  const pts = calcPoints(document.getElementById('newTaskDuration').value, selectedDiff);
+  await writeToSheet('addTask', { taskName: name, week: getWeekStr(), points: pts, category: document.getElementById('newTaskCategory').value, userName: currentUser });
   closeAddModal();
   document.getElementById('newTaskName').value = '';
   showToast(`✅ Tâche ajoutée ! +${pts} pts`);
   renderHome(); renderMarche(); renderMesMissions();
 }
 
-// ============================================================
-// BOOT
-// ============================================================
 window.addEventListener('DOMContentLoaded', async () => {
   await new Promise(r => setTimeout(r, 800));
   initLogin();
