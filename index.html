@@ -143,7 +143,29 @@
   .difficulty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .diff-btn { padding: 10px 8px; border-radius: var(--radius-sm); border: 1.5px solid var(--border2); background: var(--surface); font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; text-align: center; transition: all 0.15s; }
   .diff-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent-text); }
-  .hidden { display: none !important; }
+  .jour-section { margin-bottom: 8px; }
+  .jour-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0 8px; cursor: pointer; user-select: none;
+  }
+  .jour-titre {
+    font-family: var(--font-head); font-size: 14px; font-weight: 700;
+    color: var(--text); display: flex; align-items: center; gap: 8px;
+  }
+  .jour-titre .jour-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  }
+  .jour-titre .jour-dot.today { background: var(--amber); }
+  .jour-count {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px;
+    background: var(--surface2); color: var(--text2);
+  }
+  .jour-count.has-libre { background: var(--amber-light); color: var(--amber-text); }
+  .jour-toggle { font-size: 12px; color: var(--text3); transition: transform 0.2s; }
+  .jour-toggle.collapsed { transform: rotate(-90deg); }
+  .jour-tasks { overflow: hidden; transition: max-height 0.25s ease; }
+  .jour-tasks.collapsed { max-height: 0 !important; }
   .error-msg { text-align: center; padding: 40px 20px; color: var(--text2); font-size: 14px; }
   .error-icon { font-size: 36px; margin-bottom: 12px; }
 </style>
@@ -210,10 +232,7 @@
       <span class="week-badge" id="marcheLibresBadge"></span>
     </div>
     <div class="section" style="margin-top:16px;">
-      <div class="section-title">Tâches libres</div>
-      <div id="listeTachesLibres"></div>
-      <div class="section-title" style="margin-top:8px;">Tâches assignées</div>
-      <div id="listeTachesAssignees"></div>
+      <div id="listeTachesParJour"></div>
     </div>
   </div>
 
@@ -511,15 +530,107 @@ function renderHome() {
 function renderMarche() {
   const week = getWeekStr();
   document.getElementById('marcheSemaine').textContent = `Semaine ${week.split('-W')[1]}`;
-  const libres = allTasks.filter(t => t.Week === week && (!t.AssignedTo || t.AssignedTo === ''));
-  const assignees = allTasks.filter(t => t.Week === week && t.AssignedTo && t.AssignedTo !== '');
+
+  const weekTasks = allTasks.filter(t => t.Week === week);
+  const libres = weekTasks.filter(t => !t.AssignedTo || t.AssignedTo === '');
   document.getElementById('marcheLibresBadge').textContent = `${libres.length} libre${libres.length!==1?'s':''}`;
-  const libresEl = document.getElementById('listeTachesLibres');
-  libresEl.innerHTML = libres.length ? '' : '<div class="error-msg"><div class="error-icon">🎉</div>Toutes les tâches sont prises !</div>';
-  libres.forEach(t => libresEl.appendChild(makeTaskCard(t, false)));
-  const assigneesEl = document.getElementById('listeTachesAssignees');
-  assigneesEl.innerHTML = '';
-  assignees.forEach(t => assigneesEl.appendChild(makeTaskCard(t, true)));
+
+  const JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+  const todayIdx = (new Date().getDay() + 6) % 7; // 0=Lundi
+  const todayName = JOURS[todayIdx];
+
+  const container = document.getElementById('listeTachesParJour');
+  container.innerHTML = '';
+
+  // Grouper par jour
+  const parJour = {};
+  const sansJour = [];
+  weekTasks.forEach(t => {
+    let found = false;
+    JOURS.forEach(j => {
+      if (t.TaskName.endsWith(` — ${j}`)) { if (!parJour[j]) parJour[j] = []; parJour[j].push(t); found = true; }
+    });
+    if (!found) sansJour.push(t);
+  });
+
+  // Afficher dans l'ordre des jours, en commençant par aujourd'hui
+  const ordre = [...JOURS.slice(todayIdx), ...JOURS.slice(0, todayIdx)];
+  ordre.forEach(jour => {
+    const tasks = parJour[jour];
+    if (!tasks || tasks.length === 0) return;
+    const libresJour = tasks.filter(t => !t.AssignedTo || t.AssignedTo === '');
+    const isToday = jour === todayName;
+    const section = document.createElement('div');
+    section.className = 'jour-section';
+    section.innerHTML = `
+      <div class="jour-header" onclick="toggleJour(this)">
+        <div class="jour-titre">
+          <span class="jour-dot${isToday?' today':''}"></span>
+          ${jour}${isToday ? ' <span style="font-size:11px;color:var(--amber);font-weight:600;">— Aujourd\'hui</span>' : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="jour-count${libresJour.length>0?' has-libre':''}">${libresJour.length > 0 ? `${libresJour.length} libre${libresJour.length>1?'s':''}` : 'Complet'}</span>
+          <span class="jour-toggle">▾</span>
+        </div>
+      </div>
+      <div class="jour-tasks" style="max-height:2000px;"></div>
+    `;
+    const tasksEl = section.querySelector('.jour-tasks');
+
+    // Trier : libres en premier, puis prises
+    const sorted = [...tasks].sort((a,b) => {
+      const aFree = !a.AssignedTo || a.AssignedTo === '';
+      const bFree = !b.AssignedTo || b.AssignedTo === '';
+      return aFree === bFree ? 0 : aFree ? -1 : 1;
+    });
+    sorted.forEach(t => {
+      const taken = t.AssignedTo && t.AssignedTo !== '';
+      tasksEl.appendChild(makeTaskCard(t, taken));
+    });
+
+    // Replier automatiquement les jours passés (sauf aujourd'hui)
+    const jourIdx = JOURS.indexOf(jour);
+    const isPast = jourIdx < todayIdx;
+    if (isPast) {
+      section.querySelector('.jour-tasks').classList.add('collapsed');
+      section.querySelector('.jour-toggle').classList.add('collapsed');
+    }
+    container.appendChild(section);
+  });
+
+  // Tâches exceptionnelles sans jour
+  if (sansJour.length > 0) {
+    const libresExtra = sansJour.filter(t => !t.AssignedTo || t.AssignedTo === '');
+    const section = document.createElement('div');
+    section.className = 'jour-section';
+    section.innerHTML = `
+      <div class="jour-header" onclick="toggleJour(this)">
+        <div class="jour-titre"><span class="jour-dot" style="background:var(--danger)"></span>Tâches exceptionnelles</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="jour-count${libresExtra.length>0?' has-libre':''}">${libresExtra.length > 0 ? `${libresExtra.length} libre${libresExtra.length>1?'s':''}` : 'Toutes prises'}</span>
+          <span class="jour-toggle">▾</span>
+        </div>
+      </div>
+      <div class="jour-tasks" style="max-height:2000px;"></div>
+    `;
+    const tasksEl = section.querySelector('.jour-tasks');
+    sansJour.forEach(t => tasksEl.appendChild(makeTaskCard(t, t.AssignedTo && t.AssignedTo !== '')));
+    container.appendChild(section);
+  }
+}
+
+function toggleJour(header) {
+  const tasksEl = header.nextElementSibling;
+  const toggle = header.querySelector('.jour-toggle');
+  const isCollapsed = tasksEl.classList.contains('collapsed');
+  if (isCollapsed) {
+    tasksEl.style.maxHeight = '2000px';
+    tasksEl.classList.remove('collapsed');
+    toggle.classList.remove('collapsed');
+  } else {
+    tasksEl.classList.add('collapsed');
+    toggle.classList.add('collapsed');
+  }
 }
 
 function makeTaskCard(task, taken) {
