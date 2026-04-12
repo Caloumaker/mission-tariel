@@ -333,15 +333,22 @@ const PHOTOS = {
   'Chloé':  'https://drive.google.com/thumbnail?id=10gDPf1FeNQEkEV0bSXOUO7911HhC5uN0&sz=w200',
 };
 
-const CATEGORY_EMOJI = {
-  'Maison':    '🏠',
-  'Cuisine':   '🍳',
-  'Animaux':   '🐕',
-  'Linge':     '👕',
-  'Courses':   '🛍️',
-  'Extérieur': '🌿',
-  'Autre':     '⭐',
+const CATEGORY_IMG = {
+  'Maison':    'https://drive.google.com/thumbnail?id=1Cy2l4rTtk0hsZm27dKp5TCCF_QQwDWjL&sz=w80',
+  'Cuisine':   'https://drive.google.com/thumbnail?id=1K-0Kxdfa52gWU9rpsSo62Fu4IKjLRNDk&sz=w80',
+  'Animaux':   'https://drive.google.com/thumbnail?id=1iDA0P2dq_xIgaNO1pCTiyWx0ipbeYzW-&sz=w80',
+  'Linge':     'https://drive.google.com/thumbnail?id=1njQW2ptIl1Q0L0VSx3Uci9lddpsIM-zk&sz=w80',
+  'Courses':   'https://drive.google.com/thumbnail?id=1syX6FB2HYeD2U4eDe3IMiW7Qpb4UR6Sb&sz=w80',
+  'Extérieur': 'https://drive.google.com/thumbnail?id=1NiLZkm-fDC3FS5C-JsDUGiFwTczYoDLu&sz=w80',
+  'Autre':     'https://drive.google.com/thumbnail?id=123DFAQPpIOWqpOIEiAuAq9jlg-YX6HC0&sz=w80',
 };
+
+function categoryImgHtml(category, size) {
+  const s = size || 44;
+  const url = CATEGORY_IMG[category];
+  if (!url) return '<span style="display:inline-flex;width:'+s+'px;height:'+s+'px;border-radius:10px;background:var(--surface2);align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📋</span>';
+  return '<img src="'+url+'" style="width:'+s+'px;height:'+s+'px;border-radius:10px;object-fit:cover;flex-shrink:0;" />';
+}
 
 function avatarHtml(name, size) {
   const s = size || 34;
@@ -505,8 +512,10 @@ function goToDetail(task) {
   const isTaken = task.AssignedTo && task.AssignedTo !== '' && task.AssignedTo !== currentUser;
   const isDone = task.IsDone === 'TRUE' || task.IsDone === 'true';
 
+  const catImg = CATEGORY_IMG[task.Category];
   document.getElementById('detailHero').innerHTML = `
-    <div class="detail-name">${CATEGORY_EMOJI[task.Category]||'📋'} ${task.TaskName}</div>
+    ${catImg ? `<img src="${catImg.replace('sz=w80','sz=w400')}" style="width:100%;height:140px;object-fit:cover;border-radius:var(--radius-sm);margin-bottom:14px;" />` : ''}
+    <div class="detail-name">${task.TaskName}</div>
     <div class="detail-tags">
       <span class="detail-pts">⭐ ${task.Points} pts</span>
       ${task.Category ? `<span class="tag">${task.Category}</span>` : ''}
@@ -665,18 +674,23 @@ function makeTaskCard(task, taken) {
   const isDone = task.IsDone === 'TRUE' || task.IsDone === 'true';
   const div = document.createElement('div');
   div.className = `task-card${taken?' taken':''}${isDone?' done':''}`;
+  div.style.display = 'flex';
+  div.style.gap = '12px';
+  div.style.alignItems = 'flex-start';
   div.onclick = () => goToDetail(task);
-  const emoji = CATEGORY_EMOJI[task.Category] || '📋';
   const dot = task.AssignedTo ? `<span class="assignee-dot" style="background:${DOT_COLORS[task.AssignedTo]||'#ccc'}"></span>` : '';
   div.innerHTML = `
-    <div class="task-top">
-      <span class="task-name">${emoji} ${task.TaskName}</span>
-      <span class="pts-badge">⭐ ${task.Points}</span>
-    </div>
-    <div class="task-meta">
-      ${task.Category?`<span class="tag">${task.Category}</span>`:''}
-      ${isDone?'<span class="tag" style="background:#D8F3DC;color:#1B4332;">✓ Faite</span>':''}
-      ${task.AssignedTo?`<span class="assignee-tag">${dot}${task.AssignedTo}</span>`:''}
+    ${categoryImgHtml(task.Category, 48)}
+    <div style="flex:1;min-width:0;">
+      <div class="task-top">
+        <span class="task-name">${task.TaskName}</span>
+        <span class="pts-badge">⭐ ${task.Points}</span>
+      </div>
+      <div class="task-meta">
+        ${task.Category?`<span class="tag">${task.Category}</span>`:''}
+        ${isDone?'<span class="tag" style="background:#D8F3DC;color:#1B4332;">✓ Faite</span>':''}
+        ${task.AssignedTo?`<span class="assignee-tag">${dot}${task.AssignedTo}</span>`:''}
+      </div>
     </div>
   `;
   return div;
@@ -735,12 +749,18 @@ function renderMesMissions() {
     const isDone = t.IsDone === 'TRUE' || t.IsDone === 'true';
     const div = document.createElement('div');
     div.className = `task-card${isDone?' done':''}`;
+    div.style.display = 'flex';
+    div.style.gap = '12px';
+    div.style.alignItems = 'flex-start';
     div.onclick = () => goToDetail(t);
     div.innerHTML = `
-      <div class="task-top"><span class="task-name">${CATEGORY_EMOJI[t.Category]||'📋'} ${t.TaskName}</span><span class="pts-badge">⭐ ${t.Points}</span></div>
-      <div class="task-meta">
-        ${t.Category?`<span class="tag">${t.Category}</span>`:''}
-        <span class="tag" style="${isDone?'background:#D8F3DC;color:#1B4332':'background:#FFF3CD;color:#7D4E00'}">${isDone?'✓ Réalisée':'En cours'}</span>
+      ${categoryImgHtml(t.Category, 48)}
+      <div style="flex:1;min-width:0;">
+        <div class="task-top"><span class="task-name">${t.TaskName}</span><span class="pts-badge">⭐ ${t.Points}</span></div>
+        <div class="task-meta">
+          ${t.Category?`<span class="tag">${t.Category}</span>`:''}
+          <span class="tag" style="${isDone?'background:#D8F3DC;color:#1B4332':'background:#FFF3CD;color:#7D4E00'}">${isDone?'✓ Réalisée':'En cours'}</span>
+        </div>
       </div>
     `;
     el.appendChild(div);
