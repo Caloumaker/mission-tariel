@@ -325,6 +325,35 @@ const COLORS = {
 };
 const DOT_COLORS = { 'Maman':'#7F77DD','Papa':'#2D6A4F','Mathis':'#D85A30','Adrien':'#E9952A','Chloé':'#378ADD' };
 
+const PHOTOS = {
+  'Maman':  'https://drive.google.com/thumbnail?id=1gqGs2iX6hevm_93v-_IN_imqlmQDWXma&sz=w200',
+  'Papa':   'https://drive.google.com/thumbnail?id=1qeejL1BShWjQ8bEYrfkpzBwsbJg0l7K5&sz=w200',
+  'Mathis': 'https://drive.google.com/thumbnail?id=1W7x6W1HE4ylMlkFIzD9uVgiTLkvXOUtG&sz=w200',
+  'Adrien': 'https://drive.google.com/thumbnail?id=17JKdNJQWQoqWPBOWapmgkLk6HmFf4DaH&sz=w200',
+  'Chloé':  'https://drive.google.com/thumbnail?id=10gDPf1FeNQEkEV0bSXOUO7911HhC5uN0&sz=w200',
+};
+
+const CATEGORY_EMOJI = {
+  'Maison':    '🏠',
+  'Cuisine':   '🍳',
+  'Animaux':   '🐕',
+  'Linge':     '👕',
+  'Courses':   '🛍️',
+  'Extérieur': '🌿',
+  'Autre':     '⭐',
+};
+
+function avatarHtml(name, size) {
+  const s = size || 34;
+  const photo = PHOTOS[name];
+  const col = COLORS[name] || { bg:'#F1EFE8', text:'#444441' };
+  const fallback = `<div style="width:${s}px;height:${s}px;border-radius:50%;background:${col.bg};color:${col.text};display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:${Math.round(s*0.38)}px;font-weight:700;flex-shrink:0">${initials(name)}</div>`;
+  if (photo) {
+    return `<img src="${photo}" style="width:${s}px;height:${s}px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.outerHTML='${fallback.replace(/'/g,'"')}'" />`;
+  }
+  return fallback;
+}
+
 let currentUser = null;
 let allTasks = [];
 let allUsers = [];
@@ -423,7 +452,7 @@ async function initLogin() {
     const btn = document.createElement('button');
     btn.className = 'avatar-btn' + (saved === u.Name ? ' selected' : '');
     btn.dataset.name = u.Name;
-    btn.innerHTML = `<div class="avatar-circle" style="background:${col.bg};color:${col.text}">${initials(u.Name)}</div><div class="avatar-name">${u.Name}</div>`;
+    btn.innerHTML = `${avatarHtml(u.Name, 48)}<div class="avatar-name">${u.Name}</div>`;
     btn.onclick = () => selectUser(u.Name);
     grid.appendChild(btn);
   });
@@ -451,11 +480,9 @@ async function loadApp() {
   allTasks = tasks;
   allUsers = users.length ? users : [{Name:'Maman'},{Name:'Papa'},{Name:'Mathis'},{Name:'Adrien'},{Name:'Chloé'}];
   document.getElementById('loading').style.display = 'none';
-  const col = COLORS[currentUser] || { bg:'#F1EFE8', text:'#444441' };
   const av = document.getElementById('topbarAvatar');
-  av.textContent = initials(currentUser);
-  av.style.background = col.bg;
-  av.style.color = col.text;
+  av.innerHTML = avatarHtml(currentUser, 34);
+  av.style.background = 'none';
   av.onclick = () => { localStorage.removeItem('tariel_user'); location.reload(); };
   renderHome(); renderMarche(); renderMesMissions(); renderClassement();
 }
@@ -468,7 +495,7 @@ function goTo(screen) {
   if (nb) nb.classList.add('active');
   const titles = { home:'Mission Tariel', marche:'Marché aux missions', mesmissions:'Mes missions', classement:'Classement' };
   const col = COLORS[currentUser] || { bg:'#eee', text:'#333' };
-  document.getElementById('topbar').innerHTML = `<div class="topbar-title">${titles[screen]||'Mission Tariel'}</div><div class="topbar-avatar" onclick="localStorage.removeItem('tariel_user');location.reload()" style="background:${col.bg};color:${col.text}">${initials(currentUser)}</div>`;
+  document.getElementById('topbar').innerHTML = `<div class="topbar-title">${titles[screen]||'Mission Tariel'}</div><div class="topbar-avatar" onclick="localStorage.removeItem('tariel_user');location.reload()" style="cursor:pointer">${avatarHtml(currentUser,34)}</div>`;
 }
 
 function goToDetail(task) {
@@ -478,7 +505,7 @@ function goToDetail(task) {
   const isDone = task.IsDone === 'TRUE' || task.IsDone === 'true';
 
   document.getElementById('detailHero').innerHTML = `
-    <div class="detail-name">${task.TaskName}</div>
+    <div class="detail-name">${CATEGORY_EMOJI[task.Category]||'📋'} ${task.TaskName}</div>
     <div class="detail-tags">
       <span class="detail-pts">⭐ ${task.Points} pts</span>
       ${task.Category ? `<span class="tag">${task.Category}</span>` : ''}
@@ -508,7 +535,7 @@ function goToDetail(task) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('screen-detail').classList.add('active');
   const col = COLORS[currentUser] || { bg:'#eee', text:'#333' };
-  document.getElementById('topbar').innerHTML = `<button class="back-btn" onclick="goTo('marche')">← Retour</button><div class="topbar-title">Détail</div><div class="topbar-avatar" style="background:${col.bg};color:${col.text}">${initials(currentUser)}</div>`;
+  document.getElementById('topbar').innerHTML = `<button class="back-btn" onclick="goTo('marche')">← Retour</button><div class="topbar-title">Détail</div><div style="cursor:pointer" onclick="localStorage.removeItem('tariel_user');location.reload()">${avatarHtml(currentUser,34)}</div>`;
 }
 
 function renderHome() {
@@ -638,9 +665,13 @@ function makeTaskCard(task, taken) {
   const div = document.createElement('div');
   div.className = `task-card${taken?' taken':''}${isDone?' done':''}`;
   div.onclick = () => goToDetail(task);
+  const emoji = CATEGORY_EMOJI[task.Category] || '📋';
   const dot = task.AssignedTo ? `<span class="assignee-dot" style="background:${DOT_COLORS[task.AssignedTo]||'#ccc'}"></span>` : '';
   div.innerHTML = `
-    <div class="task-top"><span class="task-name">${task.TaskName}</span><span class="pts-badge">⭐ ${task.Points}</span></div>
+    <div class="task-top">
+      <span class="task-name">${emoji} ${task.TaskName}</span>
+      <span class="pts-badge">⭐ ${task.Points}</span>
+    </div>
     <div class="task-meta">
       ${task.Category?`<span class="tag">${task.Category}</span>`:''}
       ${isDone?'<span class="tag" style="background:#D8F3DC;color:#1B4332;">✓ Faite</span>':''}
@@ -705,7 +736,7 @@ function renderMesMissions() {
     div.className = `task-card${isDone?' done':''}`;
     div.onclick = () => goToDetail(t);
     div.innerHTML = `
-      <div class="task-top"><span class="task-name">${t.TaskName}</span><span class="pts-badge">⭐ ${t.Points}</span></div>
+      <div class="task-top"><span class="task-name">${CATEGORY_EMOJI[t.Category]||'📋'} ${t.TaskName}</span><span class="pts-badge">⭐ ${t.Points}</span></div>
       <div class="task-meta">
         ${t.Category?`<span class="tag">${t.Category}</span>`:''}
         <span class="tag" style="${isDone?'background:#D8F3DC;color:#1B4332':'background:#FFF3CD;color:#7D4E00'}">${isDone?'✓ Réalisée':'En cours'}</span>
@@ -724,7 +755,7 @@ function renderClassement() {
   })).sort((a,b)=>b.pts-a.pts);
   const podium = document.getElementById('podium');
   if (ranked.length >= 3) {
-    const p = (u,cls,medal) => { const col=COLORS[u.name]||{bg:'#eee',text:'#333'}; return `<div class="podium-item ${cls}"><div class="podium-name">${u.name}</div><div class="podium-avatar" style="background:${col.bg};color:${col.text}">${initials(u.name)}</div><div class="podium-block">${medal}</div></div>`; };
+    const p = (u,cls,medal) => { return `<div class="podium-item ${cls}"><div class="podium-name">${u.name}</div><div class="podium-avatar">${avatarHtml(u.name,48)}</div><div class="podium-block">${medal}</div></div>`; };
     podium.innerHTML = p(ranked[1],'p2','🥈')+p(ranked[0],'p1','🥇')+p(ranked[2],'p3','🥉');
   }
   const el = document.getElementById('listeClassement');
@@ -734,7 +765,7 @@ function renderClassement() {
     const medals = ['🥇','🥈','🥉'];
     const div = document.createElement('div');
     div.className = 'rank-row';
-    div.innerHTML = `<div class="rank-num">${medals[i]||(i+1)}</div><div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:13px;font-weight:700;background:${col.bg};color:${col.text};flex-shrink:0">${initials(u.name)}</div><div class="rank-name">${u.name}</div><div class="rank-pts">${u.pts} pts · ${u.done} faites</div>`;
+    div.innerHTML = `<div class="rank-num">${medals[i]||(i+1)}</div>${avatarHtml(u.name,34)}<div class="rank-name">${u.name}</div><div class="rank-pts">${u.pts} pts · ${u.done} faites</div>`;
     el.appendChild(div);
   });
 }
