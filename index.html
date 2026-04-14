@@ -798,11 +798,25 @@ function selectDiff(btn, diff) { document.querySelectorAll('.diff-btn').forEach(
 async function ajouterTache() {
   const name = document.getElementById('newTaskName').value.trim();
   if (!name) { showToast('⚠️ Donne un nom à la tâche'); return; }
-  const pts = calcPoints(document.getElementById('newTaskDuration').value, selectedDiff);
-  await writeToSheet('addTask', { taskName: name, week: getWeekStr(), points: pts, category: document.getElementById('newTaskCategory').value, userName: currentUser });
+  const cat = document.getElementById('newTaskCategory').value;
+  const dur = document.getElementById('newTaskDuration').value;
+  const pts = calcPoints(dur, selectedDiff);
+  const week = getWeekStr();
+
+  await writeToSheet('addTask', {
+    taskName: name, week, points: pts,
+    category: cat, userName: currentUser
+  });
+
   closeAddModal();
   document.getElementById('newTaskName').value = '';
-  showToast(`✅ Tâche ajoutée ! +${pts} pts`);
+  showToast(`✅ Tâche ajoutée ! Rechargement...`);
+
+  // Recharger les données depuis le Sheets
+  const tasks = await fetchSheet('Tasks');
+  allTasks = tasks;
+
+  showToast(`✅ Tâche "${name}" ajoutée !`);
   renderHome(); renderMarche(); renderMesMissions();
 }
 
