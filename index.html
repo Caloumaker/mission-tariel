@@ -468,10 +468,33 @@ let selectedTask = null;
 let selectedDiff = 'Facile';
 
 function getWeekStr(date) {
-  const d = date || new Date();
-  const jan1 = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-  return `${d.getFullYear()}-W${String(week).padStart(2,'0')}`;
+  // Si une date est fournie, calcul ISO standard
+  if (date) {
+    const d = new Date(date);
+    const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayOfWeek = tmp.getUTCDay() || 7;
+    tmp.setUTCDate(tmp.getUTCDate() + 4 - dayOfWeek);
+    const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil((((tmp - yearStart) / 86400000) + 1) / 7);
+    return tmp.getUTCFullYear() + '-W' + String(weekNo).padStart(2, '0');
+  }
+  // Sans date : on lit directement la semaine depuis les tâches chargées
+  // C'est la source de vérité — ce qui est dans le Sheets fait foi
+  if (allTasks && allTasks.length > 0) {
+    const weeks = allTasks.map(t => t.Week).filter(Boolean);
+    if (weeks.length > 0) {
+      // Prendre la semaine la plus récente présente dans les données
+      return weeks.sort().pop();
+    }
+  }
+  // Fallback ISO si pas encore de données
+  const d = new Date();
+  const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayOfWeek = tmp.getUTCDay() || 7;
+  tmp.setUTCDate(tmp.getUTCDate() + 4 - dayOfWeek);
+  const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((tmp - yearStart) / 86400000) + 1) / 7);
+  return tmp.getUTCFullYear() + '-W' + String(weekNo).padStart(2, '0');
 }
 
 function calcPoints(duration, difficulty) {
