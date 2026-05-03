@@ -369,9 +369,12 @@ let selectedTask = null;
 let selectedDiff = 'Facile';
 
 function getWeekStr(date) {
-  const d = date || new Date();
-  const jan1 = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  const d = date ? new Date(date) : new Date();
+  // Algorithme ISO 8601 — la semaine commence le lundi
+  const day = d.getDay() || 7; // Dimanche = 7 au lieu de 0
+  d.setDate(d.getDate() + 4 - day); // Jeudi de la semaine courante
+  const yearStart = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
   return `${d.getFullYear()}-W${String(week).padStart(2,'0')}`;
 }
 
