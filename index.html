@@ -468,10 +468,15 @@ let selectedTask = null;
 let selectedDiff = 'Facile';
 
 function getWeekStr(date) {
-  const d = date || new Date();
-  const jan1 = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-  return `${d.getFullYear()}-W${String(week).padStart(2,'0')}`;
+  const d = date ? new Date(date) : new Date();
+  // Forcer le calcul ISO : on cherche le jeudi de la semaine courante
+  // car la semaine ISO appartient à l'année du jeudi
+  const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayOfWeek = tmp.getUTCDay() || 7; // Lundi=1, Dimanche=7
+  tmp.setUTCDate(tmp.getUTCDate() + 4 - dayOfWeek); // Aller au jeudi
+  const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((tmp - yearStart) / 86400000) + 1) / 7);
+  return `${tmp.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }
 
 function calcPoints(duration, difficulty) {
