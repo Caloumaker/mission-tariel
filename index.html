@@ -468,15 +468,10 @@ let selectedTask = null;
 let selectedDiff = 'Facile';
 
 function getWeekStr(date) {
-  const d = date ? new Date(date) : new Date();
-  // Forcer le calcul ISO : on cherche le jeudi de la semaine courante
-  // car la semaine ISO appartient à l'année du jeudi
-  const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const dayOfWeek = tmp.getUTCDay() || 7; // Lundi=1, Dimanche=7
-  tmp.setUTCDate(tmp.getUTCDate() + 4 - dayOfWeek); // Aller au jeudi
-  const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((tmp - yearStart) / 86400000) + 1) / 7);
-  return `${tmp.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+  const d = date || new Date();
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${String(week).padStart(2,'0')}`;
 }
 
 function calcPoints(duration, difficulty) {
@@ -947,26 +942,61 @@ function renderAdminTasks() {
   const week = getWeekStr();
   const tasks = allTasks.filter(t => t.Week === week);
   const el = document.getElementById('adminContent');
-  el.innerHTML = tasks.length ? '' : '<div class="error-msg"><div class="error-icon">📋</div>Aucune tâche cette semaine.</div>';
+  el.innerHTML = '';
 
-  tasks.forEach((t, i) => {
-    const isDone = t.IsDone === 'TRUE' || t.IsDone === 'true';
-    const div = document.createElement('div');
-    div.className = 'admin-task-row';
-    div.innerHTML = `
-      <div class="admin-task-name">${t.TaskName}</div>
-      <div class="admin-task-meta">
-        <span class="tag">${t.Points} pts</span>
-        ${t.AssignedTo ? `<span class="tag" style="background:var(--accent-light);color:var(--accent-text);">👤 ${t.AssignedTo}</span>` : '<span class="tag">Libre</span>'}
-        <span class="tag" style="${isDone?'background:#D8F3DC;color:#1B4332':'background:#FFF3CD;color:#7D4E00'}">${isDone?'✓ Faite':'En cours'}</span>
-      </div>
-      <div class="admin-task-actions">
-        <button class="btn-edit" onclick="openEditTask(${i})">✏️ Modifier</button>
-        <button class="btn-delete" onclick="deleteTask(${i})">🗑</button>
-      </div>
-    `;
-    el.appendChild(div);
-  });
+  if (!tasks.length) {
+    el.innerHTML = '<div class="error-msg"><div class="error-icon">📋</div>Aucune tâche cette semaine.</div>';
+  } else {
+    // Grouper : libres en premier, puis par membre
+    const libres = tasks.filter(t => !t.AssignedTo || t.AssignedTo === '');
+    const membres = {};
+    tasks.filter(t => t.AssignedTo && t.AssignedTo !== '').forEach(t => {
+      if (!membres[t.AssignedTo]) membres[t.AssignedTo] = [];
+      membres[t.AssignedTo].push(t);
+    });
+
+    // Fonction pour rendre un groupe
+    const renderGroupe = (titre, couleurBg, couleurText, groupTasks) => {
+      const header = document.createElement('div');
+      header.style.cssText = `display:flex;align-items:center;gap:8px;margin:14px 0 8px;`;
+      header.innerHTML = `
+        <div style="font-family:var(--font-head);font-size:12px;font-weight:700;color:${couleurText};background:${couleurBg};padding:3px 10px;border-radius:20px;">${titre}</div>
+        <div style="font-size:11px;color:var(--text3);">${groupTasks.length} tâche${groupTasks.length>1?'s':''}</div>
+      `;
+      el.appendChild(header);
+
+      groupTasks.forEach(t => {
+        const globalIdx = tasks.indexOf(t);
+        const isDone = t.IsDone === 'TRUE' || t.IsDone === 'true';
+        const div = document.createElement('div');
+        div.className = 'admin-task-row';
+        div.innerHTML = `
+          <div class="admin-task-name">${t.TaskName}</div>
+          <div class="admin-task-meta">
+            <span class="tag">${t.Points} pts</span>
+            <span class="tag" style="${isDone?'background:#D8F3DC;color:#1B4332':'background:#FFF3CD;color:#7D4E00'}">${isDone?'✓ Faite':'En cours'}</span>
+          </div>
+          <div class="admin-task-actions">
+            <button class="btn-edit" onclick="openEditTask(${globalIdx})">✏️ Modifier</button>
+            <button class="btn-delete" onclick="deleteTask(${globalIdx})">🗑</button>
+          </div>
+        `;
+        el.appendChild(div);
+      });
+    };
+
+    // Tâches libres
+    if (libres.length > 0) {
+      renderGroupe('🔓 Non assignées', '#FDEAEA', '#C94B4B', libres);
+    }
+
+    // Par membre (ordre du classement)
+    const ordreMembers = allUsers.map(u => u.Name).filter(n => membres[n]);
+    ordreMembers.forEach(nom => {
+      const col = COLORS[nom] || { bg:'#eee', text:'#333' };
+      renderGroupe(`👤 ${nom}`, col.bg, col.text, membres[nom]);
+    });
+  }
 
   const addBtn = document.getElementById('adminAddBtn');
   addBtn.innerHTML = '';
