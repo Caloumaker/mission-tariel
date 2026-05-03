@@ -697,44 +697,84 @@ function makeTaskCard(task, taken) {
 }
 
 async function prendreTache() {
-  if (!selectedTask || (selectedTask.AssignedTo && selectedTask.AssignedTo !== '')) return;
+  if (!selectedTask) return;
+  if (selectedTask.AssignedTo && selectedTask.AssignedTo !== '') return;
+
   const btn = document.getElementById('btnPrendre');
   btn.textContent = 'En cours...'; btn.disabled = true;
-  await writeToSheet('assignTask', { taskName: selectedTask.TaskName, week: getWeekStr(), userName: currentUser });
+
+  // Mise à jour locale immédiate
   selectedTask.AssignedTo = currentUser;
-  btn.textContent = '✓ Tu as pris cette tâche'; btn.className = 'btn-prendre taken-btn'; btn.disabled = false;
+  selectedTask.AssignedDate = new Date().toLocaleDateString('fr-FR');
+
+  // Mettre à jour l'UI immédiatement
+  btn.textContent = '✓ Tu as pris cette tâche';
+  btn.className = 'btn-prendre taken-btn';
+  btn.disabled = false;
   document.getElementById('btnValider').classList.remove('hidden');
   document.getElementById('btnAnnuler').classList.remove('hidden');
   showToast(`✅ Tâche prise ! +${selectedTask.Points} pts potentiels`);
   renderHome(); renderMarche(); renderMesMissions();
+
+  // Écriture Sheets en arrière-plan (sans await bloquant)
+  writeToSheet('assignTask', {
+    taskName: selectedTask.TaskName,
+    week: getWeekStr(),
+    userName: currentUser
+  }).catch(e => console.error('Erreur assignTask:', e));
 }
 
 async function validerTache() {
   if (!selectedTask) return;
+
   const btn = document.getElementById('btnValider');
   btn.textContent = 'En cours...'; btn.disabled = true;
-  await writeToSheet('doneTask', { taskName: selectedTask.TaskName, week: getWeekStr(), userName: currentUser });
-  selectedTask.IsDone = 'TRUE'; selectedTask.DoneBy = currentUser;
+
+  // Mise à jour locale immédiate
+  selectedTask.IsDone = 'TRUE';
+  selectedTask.DoneBy = currentUser;
+  selectedTask.DoneDate = new Date().toLocaleDateString('fr-FR');
+
+  // Mettre à jour l'UI immédiatement
   document.getElementById('btnPrendre').textContent = '✅ Tâche réalisée';
   document.getElementById('btnPrendre').className = 'btn-prendre done-btn';
   btn.classList.add('hidden');
   document.getElementById('btnAnnuler').classList.add('hidden');
   showToast(`🎉 Bravo ! +${selectedTask.Points} points gagnés`);
   renderHome(); renderMarche(); renderMesMissions(); renderClassement();
+
+  // Écriture Sheets en arrière-plan
+  writeToSheet('doneTask', {
+    taskName: selectedTask.TaskName,
+    week: getWeekStr(),
+    userName: currentUser
+  }).catch(e => console.error('Erreur doneTask:', e));
 }
 
 async function deassignerTache() {
   if (!selectedTask) return;
+
   const btn = document.getElementById('btnAnnuler');
   btn.textContent = 'En cours...'; btn.disabled = true;
-  await writeToSheet('unassignTask', { taskName: selectedTask.TaskName, week: getWeekStr(), userName: currentUser });
-  selectedTask.AssignedTo = ''; selectedTask.AssignedDate = '';
+
+  // Mise à jour locale immédiate
+  selectedTask.AssignedTo = '';
+  selectedTask.AssignedDate = '';
+
+  // Mettre à jour l'UI immédiatement
   document.getElementById('btnPrendre').textContent = 'Je prends cette tâche →';
   document.getElementById('btnPrendre').className = 'btn-prendre';
   document.getElementById('btnValider').classList.add('hidden');
   btn.classList.add('hidden'); btn.disabled = false;
   showToast('✓ Tâche libérée');
   renderHome(); renderMarche(); renderMesMissions();
+
+  // Écriture Sheets en arrière-plan
+  writeToSheet('unassignTask', {
+    taskName: selectedTask.TaskName,
+    week: getWeekStr(),
+    userName: currentUser
+  }).catch(e => console.error('Erreur unassignTask:', e));
 }
 
 function renderMesMissions() {
@@ -803,21 +843,26 @@ async function ajouterTache() {
   const pts = calcPoints(dur, selectedDiff);
   const week = getWeekStr();
 
-  await writeToSheet('addTask', {
-    taskName: name, week, points: pts,
-    category: cat, userName: currentUser
-  });
+  // Ajouter immédiatement en mémoire locale
+  const newTask = {
+    TaskName: name, Week: week, Points: String(pts),
+    Category: cat, AssignedTo: currentUser,
+    AssignedDate: new Date().toLocaleDateString('fr-FR'),
+    IsDone: 'FALSE', DoneBy: '', DoneDate: '',
+    IsExceptional: 'TRUE', AddedBy: currentUser
+  };
+  allTasks.push(newTask);
 
   closeAddModal();
   document.getElementById('newTaskName').value = '';
-  showToast(`✅ Tâche ajoutée ! Rechargement...`);
-
-  // Recharger les données depuis le Sheets
-  const tasks = await fetchSheet('Tasks');
-  allTasks = tasks;
-
   showToast(`✅ Tâche "${name}" ajoutée !`);
   renderHome(); renderMarche(); renderMesMissions();
+
+  // Écriture Sheets en arrière-plan
+  writeToSheet('addTask', {
+    taskName: name, week, points: pts,
+    category: cat, userName: currentUser
+  }).catch(e => console.error('Erreur addTask:', e));
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
