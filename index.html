@@ -168,6 +168,20 @@
   .jour-tasks.collapsed { max-height: 0 !important; }
   .error-msg { text-align: center; padding: 40px 20px; color: var(--text2); font-size: 14px; }
   .error-icon { font-size: 36px; margin-bottom: 12px; }
+  /* ADMIN */
+  .admin-tabs { display: flex; gap: 8px; padding: 16px 20px 0; }
+  .admin-tab { flex: 1; padding: 10px; border-radius: var(--radius-sm); border: 1.5px solid var(--border2); background: var(--surface); font-family: var(--font-head); font-size: 13px; font-weight: 600; color: var(--text2); cursor: pointer; text-align: center; transition: all 0.15s; }
+  .admin-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .admin-task-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; box-shadow: var(--shadow); }
+  .admin-task-name { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .admin-task-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .admin-task-actions { display: flex; gap: 6px; }
+  .btn-edit { flex: 1; padding: 8px; border-radius: var(--radius-sm); border: 1.5px solid var(--accent); background: white; color: var(--accent); font-family: var(--font-head); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn-edit:hover { background: var(--accent-light); }
+  .btn-delete { padding: 8px 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--danger); background: white; color: var(--danger); font-family: var(--font-head); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn-delete:hover { background: var(--danger-light); }
+  .admin-add-btn { width: calc(100% - 40px); margin: 0 20px 10px; padding: 14px 16px; background: var(--accent); border: none; border-radius: var(--radius); font-family: var(--font-head); font-size: 14px; font-weight: 600; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.15s; }
+  .admin-add-btn:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
@@ -265,11 +279,96 @@
     </div>
   </div>
 
+  <!-- SCREEN ADMIN -->
+  <div class="screen" id="screen-admin">
+    <div class="admin-tabs">
+      <button class="admin-tab active" id="adminTab-tasks" onclick="switchAdminTab('tasks')">📋 Semaine</button>
+      <button class="admin-tab" id="adminTab-templates" onclick="switchAdminTab('templates')">🔄 Templates</button>
+    </div>
+    <div class="section" style="margin-top:16px;" id="adminContent"></div>
+    <div style="margin-top:4px;" id="adminAddBtn"></div>
+  </div>
+
   <div class="bottom-nav">
     <button class="nav-btn active" id="nav-home" onclick="goTo('home')"><span class="nav-icon">🏠</span>Accueil</button>
     <button class="nav-btn" id="nav-marche" onclick="goTo('marche')"><span class="nav-icon">🛒</span>Marché</button>
     <button class="nav-btn" id="nav-mesmissions" onclick="goTo('mesmissions')"><span class="nav-icon">✅</span>Mes tâches</button>
     <button class="nav-btn" id="nav-classement" onclick="goTo('classement')"><span class="nav-icon">🏆</span>Top</button>
+    <button class="nav-btn hidden" id="nav-admin" onclick="goTo('admin')"><span class="nav-icon">⚙️</span>Admin</button>
+  </div>
+</div>
+
+<!-- MODAL EDIT TACHE -->
+<div class="modal-overlay" id="editTaskModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="editTaskModalTitle">Modifier la tâche</div>
+    <input type="hidden" id="editTaskIndex" />
+    <div class="form-group">
+      <label class="form-label">Assignée à</label>
+      <select class="form-select" id="editTaskAssignee">
+        <option value="">— Non assignée —</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Statut</label>
+      <select class="form-select" id="editTaskStatus">
+        <option value="FALSE">En cours</option>
+        <option value="TRUE">Réalisée ✓</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Points</label>
+      <input class="form-input" type="number" id="editTaskPoints" min="1" max="20" />
+    </div>
+    <button class="btn-primary" onclick="saveEditTask()" style="margin-top:8px;">Enregistrer</button>
+    <button onclick="closeEditTaskModal()" style="width:100%;margin-top:10px;padding:14px;background:none;border:none;font-size:15px;color:var(--text2);cursor:pointer;font-family:var(--font-body);">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL EDIT TEMPLATE -->
+<div class="modal-overlay" id="editTemplateModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="editTemplateModalTitle">Modifier le template</div>
+    <input type="hidden" id="editTemplateIndex" />
+    <div class="form-group">
+      <label class="form-label">Nom de la tâche</label>
+      <input class="form-input" id="editTemplateName" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Fréquence</label>
+      <select class="form-select" id="editTemplateFrequency">
+        <option value="Quotidien">Quotidien</option>
+        <option value="Bi-hebdomadaire">Bi-hebdomadaire</option>
+        <option value="Hebdomadaire">Hebdomadaire</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Durée (minutes)</label>
+      <select class="form-select" id="editTemplateDuration">
+        <option value="15">15 min</option><option value="30">30 min</option>
+        <option value="45">45 min</option><option value="60">1 heure</option>
+        <option value="90">1h30</option><option value="120">2h+</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Difficulté</label>
+      <select class="form-select" id="editTemplateDifficulty">
+        <option value="Facile">😊 Facile</option>
+        <option value="Moyen">😤 Moyen</option>
+        <option value="Difficile">💪 Difficile</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Catégorie</label>
+      <select class="form-select" id="editTemplateCategory">
+        <option>Maison</option><option>Cuisine</option><option>Animaux</option>
+        <option>Linge</option><option>Courses</option><option>Extérieur</option><option>Autre</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="saveEditTemplate()" style="margin-top:8px;">Enregistrer</button>
+    <button onclick="closeEditTemplateModal()" style="width:100%;margin-top:10px;padding:14px;background:none;border:none;font-size:15px;color:var(--text2);cursor:pointer;font-family:var(--font-body);">Annuler</button>
   </div>
 </div>
 
@@ -369,12 +468,9 @@ let selectedTask = null;
 let selectedDiff = 'Facile';
 
 function getWeekStr(date) {
-  const d = date ? new Date(date) : new Date();
-  // Algorithme ISO 8601 — la semaine commence le lundi
-  const day = d.getDay() || 7; // Dimanche = 7 au lieu de 0
-  d.setDate(d.getDate() + 4 - day); // Jeudi de la semaine courante
-  const yearStart = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  const d = date || new Date();
+  const jan1 = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
   return `${d.getFullYear()}-W${String(week).padStart(2,'0')}`;
 }
 
@@ -496,6 +592,7 @@ async function loadApp() {
   av.style.background = 'none';
   av.onclick = () => { localStorage.removeItem('tariel_user'); location.reload(); };
   renderHome(); renderMarche(); renderMesMissions(); renderClassement();
+  showAdminNav();
 }
 
 function goTo(screen) {
@@ -504,9 +601,9 @@ function goTo(screen) {
   document.getElementById(`screen-${screen}`).classList.add('active');
   const nb = document.getElementById(`nav-${screen}`);
   if (nb) nb.classList.add('active');
-  const titles = { home:'Mission Tariel', marche:'Marché aux missions', mesmissions:'Mes missions', classement:'Classement' };
-  const col = COLORS[currentUser] || { bg:'#eee', text:'#333' };
+  const titles = { home:'Mission Tariel', marche:'Marché aux missions', mesmissions:'Mes missions', classement:'Classement', admin:'Administration' };
   document.getElementById('topbar').innerHTML = `<div class="topbar-title">${titles[screen]||'Mission Tariel'}</div><div class="topbar-avatar" onclick="localStorage.removeItem('tariel_user');location.reload()" style="cursor:pointer">${avatarHtml(currentUser,34)}</div>`;
+  if (screen === 'admin') goToAdmin();
 }
 
 function goToDetail(task) {
@@ -700,84 +797,44 @@ function makeTaskCard(task, taken) {
 }
 
 async function prendreTache() {
-  if (!selectedTask) return;
-  if (selectedTask.AssignedTo && selectedTask.AssignedTo !== '') return;
-
+  if (!selectedTask || (selectedTask.AssignedTo && selectedTask.AssignedTo !== '')) return;
   const btn = document.getElementById('btnPrendre');
   btn.textContent = 'En cours...'; btn.disabled = true;
-
-  // Mise à jour locale immédiate
+  await writeToSheet('assignTask', { taskName: selectedTask.TaskName, week: getWeekStr(), userName: currentUser });
   selectedTask.AssignedTo = currentUser;
-  selectedTask.AssignedDate = new Date().toLocaleDateString('fr-FR');
-
-  // Mettre à jour l'UI immédiatement
-  btn.textContent = '✓ Tu as pris cette tâche';
-  btn.className = 'btn-prendre taken-btn';
-  btn.disabled = false;
+  btn.textContent = '✓ Tu as pris cette tâche'; btn.className = 'btn-prendre taken-btn'; btn.disabled = false;
   document.getElementById('btnValider').classList.remove('hidden');
   document.getElementById('btnAnnuler').classList.remove('hidden');
   showToast(`✅ Tâche prise ! +${selectedTask.Points} pts potentiels`);
   renderHome(); renderMarche(); renderMesMissions();
-
-  // Écriture Sheets en arrière-plan (sans await bloquant)
-  writeToSheet('assignTask', {
-    taskName: selectedTask.TaskName,
-    week: getWeekStr(),
-    userName: currentUser
-  }).catch(e => console.error('Erreur assignTask:', e));
 }
 
 async function validerTache() {
   if (!selectedTask) return;
-
   const btn = document.getElementById('btnValider');
   btn.textContent = 'En cours...'; btn.disabled = true;
-
-  // Mise à jour locale immédiate
-  selectedTask.IsDone = 'TRUE';
-  selectedTask.DoneBy = currentUser;
-  selectedTask.DoneDate = new Date().toLocaleDateString('fr-FR');
-
-  // Mettre à jour l'UI immédiatement
+  await writeToSheet('doneTask', { taskName: selectedTask.TaskName, week: getWeekStr(), userName: currentUser });
+  selectedTask.IsDone = 'TRUE'; selectedTask.DoneBy = currentUser;
   document.getElementById('btnPrendre').textContent = '✅ Tâche réalisée';
   document.getElementById('btnPrendre').className = 'btn-prendre done-btn';
   btn.classList.add('hidden');
   document.getElementById('btnAnnuler').classList.add('hidden');
   showToast(`🎉 Bravo ! +${selectedTask.Points} points gagnés`);
   renderHome(); renderMarche(); renderMesMissions(); renderClassement();
-
-  // Écriture Sheets en arrière-plan
-  writeToSheet('doneTask', {
-    taskName: selectedTask.TaskName,
-    week: getWeekStr(),
-    userName: currentUser
-  }).catch(e => console.error('Erreur doneTask:', e));
 }
 
 async function deassignerTache() {
   if (!selectedTask) return;
-
   const btn = document.getElementById('btnAnnuler');
   btn.textContent = 'En cours...'; btn.disabled = true;
-
-  // Mise à jour locale immédiate
-  selectedTask.AssignedTo = '';
-  selectedTask.AssignedDate = '';
-
-  // Mettre à jour l'UI immédiatement
+  await writeToSheet('unassignTask', { taskName: selectedTask.TaskName, week: getWeekStr(), userName: currentUser });
+  selectedTask.AssignedTo = ''; selectedTask.AssignedDate = '';
   document.getElementById('btnPrendre').textContent = 'Je prends cette tâche →';
   document.getElementById('btnPrendre').className = 'btn-prendre';
   document.getElementById('btnValider').classList.add('hidden');
   btn.classList.add('hidden'); btn.disabled = false;
   showToast('✓ Tâche libérée');
   renderHome(); renderMarche(); renderMesMissions();
-
-  // Écriture Sheets en arrière-plan
-  writeToSheet('unassignTask', {
-    taskName: selectedTask.TaskName,
-    week: getWeekStr(),
-    userName: currentUser
-  }).catch(e => console.error('Erreur unassignTask:', e));
 }
 
 function renderMesMissions() {
@@ -841,31 +898,237 @@ function selectDiff(btn, diff) { document.querySelectorAll('.diff-btn').forEach(
 async function ajouterTache() {
   const name = document.getElementById('newTaskName').value.trim();
   if (!name) { showToast('⚠️ Donne un nom à la tâche'); return; }
-  const cat = document.getElementById('newTaskCategory').value;
-  const dur = document.getElementById('newTaskDuration').value;
-  const pts = calcPoints(dur, selectedDiff);
-  const week = getWeekStr();
-
-  // Ajouter immédiatement en mémoire locale
-  const newTask = {
-    TaskName: name, Week: week, Points: String(pts),
-    Category: cat, AssignedTo: currentUser,
-    AssignedDate: new Date().toLocaleDateString('fr-FR'),
-    IsDone: 'FALSE', DoneBy: '', DoneDate: '',
-    IsExceptional: 'TRUE', AddedBy: currentUser
-  };
-  allTasks.push(newTask);
-
+  const pts = calcPoints(document.getElementById('newTaskDuration').value, selectedDiff);
+  await writeToSheet('addTask', { taskName: name, week: getWeekStr(), points: pts, category: document.getElementById('newTaskCategory').value, userName: currentUser });
   closeAddModal();
   document.getElementById('newTaskName').value = '';
-  showToast(`✅ Tâche "${name}" ajoutée !`);
+  showToast(`✅ Tâche ajoutée ! +${pts} pts`);
+  renderHome(); renderMarche(); renderMesMissions();
+}
+
+// ============================================================
+// ADMIN
+// ============================================================
+let allTemplates = [];
+let currentAdminTab = 'tasks';
+let editingTaskIdx = -1;
+let editingTemplateIdx = -1;
+
+function isAdmin() {
+  const user = allUsers.find(u => u.Name === currentUser);
+  return user && (user.IsAdmin === 'TRUE' || user.IsAdmin === true);
+}
+
+function showAdminNav() {
+  const btn = document.getElementById('nav-admin');
+  if (btn) { if (isAdmin()) btn.classList.remove('hidden'); else btn.classList.add('hidden'); }
+}
+
+async function goToAdmin() {
+  allTemplates = await fetchSheet('TemplateTasks');
+  switchAdminTab(currentAdminTab);
+}
+
+function switchAdminTab(tab) {
+  currentAdminTab = tab;
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  const activeTab = document.getElementById('adminTab-' + tab);
+  if (activeTab) activeTab.classList.add('active');
+  if (tab === 'tasks') renderAdminTasks();
+  else renderAdminTemplates();
+}
+
+function renderAdminTasks() {
+  const week = getWeekStr();
+  const tasks = allTasks.filter(t => t.Week === week);
+  const el = document.getElementById('adminContent');
+  el.innerHTML = tasks.length ? '' : '<div class="error-msg"><div class="error-icon">📋</div>Aucune tâche cette semaine.</div>';
+
+  tasks.forEach((t, i) => {
+    const isDone = t.IsDone === 'TRUE' || t.IsDone === 'true';
+    const div = document.createElement('div');
+    div.className = 'admin-task-row';
+    div.innerHTML = `
+      <div class="admin-task-name">${t.TaskName}</div>
+      <div class="admin-task-meta">
+        <span class="tag">${t.Points} pts</span>
+        ${t.AssignedTo ? `<span class="tag" style="background:var(--accent-light);color:var(--accent-text);">👤 ${t.AssignedTo}</span>` : '<span class="tag">Libre</span>'}
+        <span class="tag" style="${isDone?'background:#D8F3DC;color:#1B4332':'background:#FFF3CD;color:#7D4E00'}">${isDone?'✓ Faite':'En cours'}</span>
+      </div>
+      <div class="admin-task-actions">
+        <button class="btn-edit" onclick="openEditTask(${i})">✏️ Modifier</button>
+        <button class="btn-delete" onclick="deleteTask(${i})">🗑</button>
+      </div>
+    `;
+    el.appendChild(div);
+  });
+
+  const addBtn = document.getElementById('adminAddBtn');
+  addBtn.innerHTML = '';
+  const btn = document.createElement('button');
+  btn.className = 'admin-add-btn';
+  btn.innerHTML = '+ Ajouter une tâche cette semaine';
+  btn.onclick = openAddModal;
+  addBtn.appendChild(btn);
+}
+
+function renderAdminTemplates() {
+  const el = document.getElementById('adminContent');
+  el.innerHTML = allTemplates.length ? '' : '<div class="error-msg"><div class="error-icon">🔄</div>Aucun template.</div>';
+
+  allTemplates.forEach((t, i) => {
+    const pts = calcPoints(t.DurationMinutes, t.Difficulty);
+    const div = document.createElement('div');
+    div.className = 'admin-task-row';
+    div.innerHTML = `
+      <div class="admin-task-name">${t.TaskName}</div>
+      <div class="admin-task-meta">
+        <span class="tag">${t.Frequency}</span>
+        <span class="tag">${t.DurationMinutes} min</span>
+        <span class="tag">${t.Difficulty}</span>
+        <span class="tag">${pts} pts</span>
+        ${t.Category ? `<span class="tag">${t.Category}</span>` : ''}
+      </div>
+      <div class="admin-task-actions">
+        <button class="btn-edit" onclick="openEditTemplate(${i})">✏️ Modifier</button>
+        <button class="btn-delete" onclick="deleteTemplate(${i})">🗑</button>
+      </div>
+    `;
+    el.appendChild(div);
+  });
+
+  const addBtn = document.getElementById('adminAddBtn');
+  addBtn.innerHTML = '';
+  const btn = document.createElement('button');
+  btn.className = 'admin-add-btn';
+  btn.innerHTML = '+ Ajouter un template';
+  btn.onclick = () => openEditTemplate(-1);
+  addBtn.appendChild(btn);
+}
+
+// --- EDIT TACHE ---
+function openEditTask(idx) {
+  const week = getWeekStr();
+  const tasks = allTasks.filter(t => t.Week === week);
+  const task = tasks[idx];
+  editingTaskIdx = idx;
+
+  document.getElementById('editTaskModalTitle').textContent = task.TaskName;
+  document.getElementById('editTaskIndex').value = idx;
+  document.getElementById('editTaskPoints').value = task.Points;
+  document.getElementById('editTaskStatus').value = (task.IsDone === 'TRUE' || task.IsDone === 'true') ? 'TRUE' : 'FALSE';
+
+  const sel = document.getElementById('editTaskAssignee');
+  sel.innerHTML = '<option value="">— Non assignée —</option>';
+  allUsers.forEach(u => {
+    const opt = document.createElement('option');
+    opt.value = u.Name; opt.textContent = u.Name;
+    if (u.Name === task.AssignedTo) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  document.getElementById('editTaskModal').classList.add('open');
+}
+
+function closeEditTaskModal() { document.getElementById('editTaskModal').classList.remove('open'); }
+
+async function saveEditTask() {
+  const week = getWeekStr();
+  const tasks = allTasks.filter(t => t.Week === week);
+  const task = tasks[editingTaskIdx];
+  const assignee = document.getElementById('editTaskAssignee').value;
+  const status = document.getElementById('editTaskStatus').value;
+  const points = document.getElementById('editTaskPoints').value;
+
+  // Mise à jour locale
+  task.AssignedTo = assignee;
+  task.IsDone = status;
+  task.Points = points;
+
+  closeEditTaskModal();
+  showToast('✅ Tâche mise à jour');
+  renderAdminTasks();
   renderHome(); renderMarche(); renderMesMissions();
 
-  // Écriture Sheets en arrière-plan
-  writeToSheet('addTask', {
-    taskName: name, week, points: pts,
-    category: cat, userName: currentUser
-  }).catch(e => console.error('Erreur addTask:', e));
+  // Écriture Sheets
+  writeToSheet('adminEditTask', {
+    taskName: task.TaskName, week,
+    assignedTo: assignee, isDone: status, points
+  }).catch(e => console.error(e));
+}
+
+async function deleteTask(idx) {
+  if (!confirm('Supprimer cette tâche ?')) return;
+  const week = getWeekStr();
+  const tasks = allTasks.filter(t => t.Week === week);
+  const task = tasks[idx];
+
+  // Supprimer localement
+  const globalIdx = allTasks.indexOf(task);
+  if (globalIdx > -1) allTasks.splice(globalIdx, 1);
+
+  showToast('🗑 Tâche supprimée');
+  renderAdminTasks();
+  renderHome(); renderMarche(); renderMesMissions();
+
+  writeToSheet('adminDeleteTask', { taskName: task.TaskName, week })
+    .catch(e => console.error(e));
+}
+
+// --- EDIT TEMPLATE ---
+function openEditTemplate(idx) {
+  editingTemplateIdx = idx;
+  const isNew = idx === -1;
+  const t = isNew ? { TaskName:'', Frequency:'Quotidien', DurationMinutes:'30', Difficulty:'Facile', Category:'Maison' } : allTemplates[idx];
+
+  document.getElementById('editTemplateModalTitle').textContent = isNew ? 'Nouveau template' : t.TaskName;
+  document.getElementById('editTemplateIndex').value = idx;
+  document.getElementById('editTemplateName').value = t.TaskName;
+  document.getElementById('editTemplateFrequency').value = t.Frequency;
+  document.getElementById('editTemplateDuration').value = t.DurationMinutes;
+  document.getElementById('editTemplateDifficulty').value = t.Difficulty;
+  document.getElementById('editTemplateCategory').value = t.Category || 'Maison';
+
+  document.getElementById('editTemplateModal').classList.add('open');
+}
+
+function closeEditTemplateModal() { document.getElementById('editTemplateModal').classList.remove('open'); }
+
+async function saveEditTemplate() {
+  const idx = editingTemplateIdx;
+  const isNew = idx === -1;
+  const name = document.getElementById('editTemplateName').value.trim();
+  if (!name) { showToast('⚠️ Donne un nom'); return; }
+
+  const freq = document.getElementById('editTemplateFrequency').value;
+  const dur = document.getElementById('editTemplateDuration').value;
+  const diff = document.getElementById('editTemplateDifficulty').value;
+  const cat = document.getElementById('editTemplateCategory').value;
+  const pts = calcPoints(dur, diff);
+
+  const template = { TaskName: name, Frequency: freq, DurationMinutes: dur, Difficulty: diff, Points: String(pts), Category: cat, IsRecurring: 'TRUE' };
+
+  if (isNew) allTemplates.push(template);
+  else allTemplates[idx] = { ...allTemplates[idx], ...template };
+
+  closeEditTemplateModal();
+  showToast(isNew ? '✅ Template ajouté' : '✅ Template mis à jour');
+  renderAdminTemplates();
+
+  writeToSheet(isNew ? 'adminAddTemplate' : 'adminEditTemplate', {
+    originalName: isNew ? '' : allTemplates[idx]?.TaskName || name,
+    taskName: name, frequency: freq, duration: dur,
+    difficulty: diff, category: cat, points: pts
+  }).catch(e => console.error(e));
+}
+
+async function deleteTemplate(idx) {
+  if (!confirm('Supprimer ce template ?')) return;
+  const t = allTemplates[idx];
+  allTemplates.splice(idx, 1);
+  showToast('🗑 Template supprimé');
+  renderAdminTemplates();
+  writeToSheet('adminDeleteTemplate', { taskName: t.TaskName }).catch(e => console.error(e));
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
